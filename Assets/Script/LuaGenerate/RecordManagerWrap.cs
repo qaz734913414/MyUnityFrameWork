@@ -9,8 +9,17 @@ public class RecordManagerWrap
 		L.BeginClass(typeof(RecordManager), typeof(System.Object));
 		L.RegFunction("GetData", GetData);
 		L.RegFunction("SaveData", SaveData);
-		L.RegFunction("CleanCatch", CleanCatch);
+		L.RegFunction("CleanRecord", CleanRecord);
+		L.RegFunction("CleanAllRecord", CleanAllRecord);
+		L.RegFunction("CleanCache", CleanCache);
 		L.RegFunction("SaveRecord", SaveRecord);
+		L.RegFunction("GetIntRecord", GetIntRecord);
+		L.RegFunction("GetStringRecord", GetStringRecord);
+		L.RegFunction("GetBoolRecord", GetBoolRecord);
+		L.RegFunction("GetFloatRecord", GetFloatRecord);
+		L.RegFunction("GetVector2Record", GetVector2Record);
+		L.RegFunction("GetVector3Record", GetVector3Record);
+		L.RegFunction("GetColorRecord", GetColorRecord);
 		L.RegFunction("New", _CreateRecordManager);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("c_directoryName", get_c_directoryName, null);
@@ -77,12 +86,43 @@ public class RecordManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int CleanCatch(IntPtr L)
+	static int CleanRecord(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			string arg0 = ToLua.CheckString(L, 1);
+			RecordManager.CleanRecord(arg0);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int CleanAllRecord(IntPtr L)
 	{
 		try
 		{
 			ToLua.CheckArgsCount(L, 0);
-			RecordManager.CleanCatch();
+			RecordManager.CleanAllRecord();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int CleanCache(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 0);
+			RecordManager.CleanCache();
 			return 0;
 		}
 		catch(Exception e)
@@ -102,7 +142,7 @@ public class RecordManagerWrap
 			{
 				string arg0 = ToLua.ToString(L, 1);
 				string arg1 = ToLua.ToString(L, 2);
-				UnityEngine.Vector2 arg2 = ToLua.ToVector2(L, 3);
+				UnityEngine.Vector2 arg2 = (UnityEngine.Vector2)ToLua.ToObject(L, 3);
 				RecordManager.SaveRecord(arg0, arg1, arg2);
 				return 0;
 			}
@@ -110,7 +150,7 @@ public class RecordManagerWrap
 			{
 				string arg0 = ToLua.ToString(L, 1);
 				string arg1 = ToLua.ToString(L, 2);
-				UnityEngine.Vector3 arg2 = ToLua.ToVector3(L, 3);
+				UnityEngine.Vector3 arg2 = (UnityEngine.Vector3)ToLua.ToObject(L, 3);
 				RecordManager.SaveRecord(arg0, arg1, arg2);
 				return 0;
 			}
@@ -118,7 +158,7 @@ public class RecordManagerWrap
 			{
 				string arg0 = ToLua.ToString(L, 1);
 				string arg1 = ToLua.ToString(L, 2);
-				UnityEngine.Color arg2 = ToLua.ToColor(L, 3);
+				UnityEngine.Color arg2 = (UnityEngine.Color)ToLua.ToObject(L, 3);
 				RecordManager.SaveRecord(arg0, arg1, arg2);
 				return 0;
 			}
@@ -150,6 +190,139 @@ public class RecordManagerWrap
 			{
 				return LuaDLL.luaL_throw(L, "invalid arguments to method: RecordManager.SaveRecord");
 			}
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetIntRecord(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			string arg0 = ToLua.CheckString(L, 1);
+			string arg1 = ToLua.CheckString(L, 2);
+			int arg2 = (int)LuaDLL.luaL_checknumber(L, 3);
+			int o = RecordManager.GetIntRecord(arg0, arg1, arg2);
+			LuaDLL.lua_pushinteger(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetStringRecord(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			string arg0 = ToLua.CheckString(L, 1);
+			string arg1 = ToLua.CheckString(L, 2);
+			string arg2 = ToLua.CheckString(L, 3);
+			string o = RecordManager.GetStringRecord(arg0, arg1, arg2);
+			LuaDLL.lua_pushstring(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetBoolRecord(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			string arg0 = ToLua.CheckString(L, 1);
+			string arg1 = ToLua.CheckString(L, 2);
+			bool arg2 = LuaDLL.luaL_checkboolean(L, 3);
+			bool o = RecordManager.GetBoolRecord(arg0, arg1, arg2);
+			LuaDLL.lua_pushboolean(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetFloatRecord(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			string arg0 = ToLua.CheckString(L, 1);
+			string arg1 = ToLua.CheckString(L, 2);
+			float arg2 = (float)LuaDLL.luaL_checknumber(L, 3);
+			float o = RecordManager.GetFloatRecord(arg0, arg1, arg2);
+			LuaDLL.lua_pushnumber(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetVector2Record(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			string arg0 = ToLua.CheckString(L, 1);
+			string arg1 = ToLua.CheckString(L, 2);
+			UnityEngine.Vector2 arg2 = (UnityEngine.Vector2)ToLua.CheckObject(L, 3, typeof(UnityEngine.Vector2));
+			UnityEngine.Vector2 o = RecordManager.GetVector2Record(arg0, arg1, arg2);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetVector3Record(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			string arg0 = ToLua.CheckString(L, 1);
+			string arg1 = ToLua.CheckString(L, 2);
+			UnityEngine.Vector3 arg2 = (UnityEngine.Vector3)ToLua.CheckObject(L, 3, typeof(UnityEngine.Vector3));
+			UnityEngine.Vector3 o = RecordManager.GetVector3Record(arg0, arg1, arg2);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetColorRecord(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			string arg0 = ToLua.CheckString(L, 1);
+			string arg1 = ToLua.CheckString(L, 2);
+			UnityEngine.Color arg2 = (UnityEngine.Color)ToLua.CheckObject(L, 3, typeof(UnityEngine.Color));
+			UnityEngine.Color o = RecordManager.GetColorRecord(arg0, arg1, arg2);
+			ToLua.Push(L, o);
+			return 1;
 		}
 		catch(Exception e)
 		{

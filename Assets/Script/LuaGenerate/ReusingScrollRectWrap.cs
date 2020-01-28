@@ -7,48 +7,74 @@ public class ReusingScrollRectWrap
 	public static void Register(LuaState L)
 	{
 		L.BeginClass(typeof(ReusingScrollRect), typeof(ScrollRectInput));
-		L.RegFunction("Init", Init);
+		L.RegFunction("SetItem", SetItem);
+		L.RegFunction("Dispose", Dispose);
+		L.RegFunction("Refresh", Refresh);
 		L.RegFunction("SetData", SetData);
 		L.RegFunction("GetItem", GetItem);
 		L.RegFunction("GetItemAnchorPos", GetItemAnchorPos);
 		L.RegFunction("SetPos", SetPos);
+		L.RegFunction("Update", Update);
 		L.RegFunction("Rebuild", Rebuild);
+		L.RegFunction("StartEnterAnim", StartEnterAnim);
+		L.RegFunction("StartExitAnim", StartExitAnim);
+		L.RegFunction("EnterAnim", EnterAnim);
+		L.RegFunction("ExitAnim", ExitAnim);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("m_ItemName", get_m_ItemName, set_m_ItemName);
 		L.RegVar("m_isInversion", get_m_isInversion, set_m_isInversion);
+		L.RegVar("m_isReceiveControl", get_m_isReceiveControl, set_m_isReceiveControl);
 		L.RegVar("m_datas", get_m_datas, set_m_datas);
 		L.RegVar("m_items", get_m_items, set_m_items);
-		L.RegVar("m_itemCatchs", get_m_itemCatchs, set_m_itemCatchs);
+		L.RegVar("m_itemCaches", get_m_itemCaches, set_m_itemCaches);
+		L.RegVar("m_itemPrefab", get_m_itemPrefab, set_m_itemPrefab);
+		L.RegVar("m_itemSize", get_m_itemSize, set_m_itemSize);
 		L.EndClass();
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int Init(IntPtr L)
+	static int SetItem(IntPtr L)
 	{
 		try
 		{
-			int count = LuaDLL.lua_gettop(L);
+			ToLua.CheckArgsCount(L, 2);
+			ReusingScrollRect obj = (ReusingScrollRect)ToLua.CheckObject(L, 1, typeof(ReusingScrollRect));
+			string arg0 = ToLua.CheckString(L, 2);
+			obj.SetItem(arg0);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
 
-			if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(ReusingScrollRect), typeof(string)))
-			{
-				ReusingScrollRect obj = (ReusingScrollRect)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				obj.Init(arg0);
-				return 0;
-			}
-			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(ReusingScrollRect), typeof(string), typeof(string)))
-			{
-				ReusingScrollRect obj = (ReusingScrollRect)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				string arg1 = ToLua.ToString(L, 3);
-				obj.Init(arg0, arg1);
-				return 0;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: ReusingScrollRect.Init");
-			}
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int Dispose(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			ReusingScrollRect obj = (ReusingScrollRect)ToLua.CheckObject(L, 1, typeof(ReusingScrollRect));
+			obj.Dispose();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int Refresh(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			ReusingScrollRect obj = (ReusingScrollRect)ToLua.CheckObject(L, 1, typeof(ReusingScrollRect));
+			obj.Refresh();
+			return 0;
 		}
 		catch(Exception e)
 		{
@@ -116,8 +142,24 @@ public class ReusingScrollRectWrap
 		{
 			ToLua.CheckArgsCount(L, 2);
 			ReusingScrollRect obj = (ReusingScrollRect)ToLua.CheckObject(L, 1, typeof(ReusingScrollRect));
-			UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 2);
+			UnityEngine.Vector3 arg0 = (UnityEngine.Vector3)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector3));
 			obj.SetPos(arg0);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int Update(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			ReusingScrollRect obj = (ReusingScrollRect)ToLua.CheckObject(L, 1, typeof(ReusingScrollRect));
+			obj.Update();
 			return 0;
 		}
 		catch(Exception e)
@@ -136,6 +178,72 @@ public class ReusingScrollRectWrap
 			UnityEngine.UI.CanvasUpdate arg0 = (UnityEngine.UI.CanvasUpdate)ToLua.CheckObject(L, 2, typeof(UnityEngine.UI.CanvasUpdate));
 			obj.Rebuild(arg0);
 			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int StartEnterAnim(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			ReusingScrollRect obj = (ReusingScrollRect)ToLua.CheckObject(L, 1, typeof(ReusingScrollRect));
+			obj.StartEnterAnim();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int StartExitAnim(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			ReusingScrollRect obj = (ReusingScrollRect)ToLua.CheckObject(L, 1, typeof(ReusingScrollRect));
+			obj.StartExitAnim();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int EnterAnim(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			ReusingScrollRect obj = (ReusingScrollRect)ToLua.CheckObject(L, 1, typeof(ReusingScrollRect));
+			System.Collections.IEnumerator o = obj.EnterAnim();
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int ExitAnim(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			ReusingScrollRect obj = (ReusingScrollRect)ToLua.CheckObject(L, 1, typeof(ReusingScrollRect));
+			System.Collections.IEnumerator o = obj.ExitAnim();
+			ToLua.Push(L, o);
+			return 1;
 		}
 		catch(Exception e)
 		{
@@ -200,6 +308,25 @@ public class ReusingScrollRectWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_m_isReceiveControl(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			ReusingScrollRect obj = (ReusingScrollRect)o;
+			bool ret = obj.m_isReceiveControl;
+			LuaDLL.lua_pushboolean(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_isReceiveControl on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_m_datas(IntPtr L)
 	{
 		object o = null;
@@ -238,7 +365,7 @@ public class ReusingScrollRectWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_m_itemCatchs(IntPtr L)
+	static int get_m_itemCaches(IntPtr L)
 	{
 		object o = null;
 
@@ -246,13 +373,51 @@ public class ReusingScrollRectWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			ReusingScrollRect obj = (ReusingScrollRect)o;
-			System.Collections.Generic.List<ReusingScrollItemBase> ret = obj.m_itemCatchs;
+			System.Collections.Generic.List<ReusingScrollItemBase> ret = obj.m_itemCaches;
 			ToLua.PushObject(L, ret);
 			return 1;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_itemCatchs on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_itemCaches on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_m_itemPrefab(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			ReusingScrollRect obj = (ReusingScrollRect)o;
+			UnityEngine.GameObject ret = obj.m_itemPrefab;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_itemPrefab on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_m_itemSize(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			ReusingScrollRect obj = (ReusingScrollRect)o;
+			UnityEngine.Vector3 ret = obj.m_itemSize;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_itemSize on a nil value" : e.Message);
 		}
 	}
 
@@ -295,6 +460,25 @@ public class ReusingScrollRectWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_m_isReceiveControl(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			ReusingScrollRect obj = (ReusingScrollRect)o;
+			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
+			obj.m_isReceiveControl = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_isReceiveControl on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_m_datas(IntPtr L)
 	{
 		object o = null;
@@ -333,7 +517,7 @@ public class ReusingScrollRectWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_m_itemCatchs(IntPtr L)
+	static int set_m_itemCaches(IntPtr L)
 	{
 		object o = null;
 
@@ -342,12 +526,50 @@ public class ReusingScrollRectWrap
 			o = ToLua.ToObject(L, 1);
 			ReusingScrollRect obj = (ReusingScrollRect)o;
 			System.Collections.Generic.List<ReusingScrollItemBase> arg0 = (System.Collections.Generic.List<ReusingScrollItemBase>)ToLua.CheckObject(L, 2, typeof(System.Collections.Generic.List<ReusingScrollItemBase>));
-			obj.m_itemCatchs = arg0;
+			obj.m_itemCaches = arg0;
 			return 0;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_itemCatchs on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_itemCaches on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_m_itemPrefab(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			ReusingScrollRect obj = (ReusingScrollRect)o;
+			UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 2, typeof(UnityEngine.GameObject));
+			obj.m_itemPrefab = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_itemPrefab on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_m_itemSize(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			ReusingScrollRect obj = (ReusingScrollRect)o;
+			UnityEngine.Vector3 arg0 = (UnityEngine.Vector3)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector3));
+			obj.m_itemSize = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_itemSize on a nil value" : e.Message);
 		}
 	}
 }

@@ -4,7 +4,7 @@ using System;
 
 public class UIWindowLuaHelper : UIWindowBase
 {
-
+#if USE_LUA
     public override void OnInit()
     {
         UIEventCallBackHelper.CallOnUIInit(this);
@@ -13,6 +13,16 @@ public class UIWindowLuaHelper : UIWindowBase
     public override void OnOpen()
     {
         UIEventCallBackHelper.CallOnUIOpen(this);
+    }
+
+    public override void OnShow()
+    {
+        UIEventCallBackHelper.CallOnUIShow(this);
+    }
+
+    public override void OnHide()
+    {
+        UIEventCallBackHelper.CallOnUIHide(this);
     }
 
     public override IEnumerator EnterAnim(UIAnimCallBack l_animComplete, UICallBack l_callBack, params object[] objs)
@@ -70,8 +80,9 @@ public class UIWindowLuaHelper : UIWindowBase
         UIEventCallBackHelper.CallOnCompleteExitAnim(this);
     }
 
-    public override void OnDestroy()
+    protected override void OnUIDestroy()
     {
         UIEventCallBackHelper.CallOnUIDestroy(this);
     }
+#endif
 }

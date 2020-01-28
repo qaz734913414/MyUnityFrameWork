@@ -9,12 +9,16 @@ public class NetworkManagerWrap
 		L.BeginClass(typeof(NetworkManager), typeof(System.Object));
 		L.RegFunction("Init", Init);
 		L.RegFunction("Dispose", Dispose);
+		L.RegFunction("SetServer", SetServer);
+		L.RegFunction("SetDomain", SetDomain);
 		L.RegFunction("Connect", Connect);
 		L.RegFunction("DisConnect", DisConnect);
 		L.RegFunction("SendMessage", SendMessage);
+		L.RegFunction("HasHeartBeatMessage", HasHeartBeatMessage);
+		L.RegFunction("GetHeartBeatMessage", GetHeartBeatMessage);
 		L.RegFunction("New", _CreateNetworkManager);
 		L.RegFunction("__tostring", ToLua.op_ToString);
-		L.RegVar("IsConnect", get_IsConnect, set_IsConnect);
+		L.RegVar("IsConnect", get_IsConnect, null);
 		L.EndClass();
 	}
 
@@ -47,9 +51,10 @@ public class NetworkManagerWrap
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 1);
+			ToLua.CheckArgsCount(L, 2);
 			string arg0 = ToLua.CheckString(L, 1);
-			NetworkManager.Init(arg0);
+			string arg1 = ToLua.CheckString(L, 2);
+			NetworkManager.Init(arg0, arg1);
 			return 0;
 		}
 		catch(Exception e)
@@ -65,6 +70,40 @@ public class NetworkManagerWrap
 		{
 			ToLua.CheckArgsCount(L, 0);
 			NetworkManager.Dispose();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int SetServer(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			string arg0 = ToLua.CheckString(L, 1);
+			int arg1 = (int)LuaDLL.luaL_checknumber(L, 2);
+			NetworkManager.SetServer(arg0, arg1);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int SetDomain(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			string arg0 = ToLua.CheckString(L, 1);
+			int arg1 = (int)LuaDLL.luaL_checknumber(L, 2);
+			NetworkManager.SetDomain(arg0, arg1);
 			return 0;
 		}
 		catch(Exception e)
@@ -116,6 +155,12 @@ public class NetworkManagerWrap
 				NetworkManager.SendMessage(arg0);
 				return 0;
 			}
+			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(byte[])))
+			{
+				byte[] arg0 = ToLua.CheckByteBuffer(L, 1);
+				NetworkManager.SendMessage(arg0);
+				return 0;
+			}
 			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(string), typeof(System.Collections.Generic.Dictionary<string,object>)))
 			{
 				string arg0 = ToLua.ToString(L, 1);
@@ -135,11 +180,13 @@ public class NetworkManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_IsConnect(IntPtr L)
+	static int HasHeartBeatMessage(IntPtr L)
 	{
 		try
 		{
-			LuaDLL.lua_pushboolean(L, NetworkManager.IsConnect);
+			ToLua.CheckArgsCount(L, 0);
+			bool o = NetworkManager.HasHeartBeatMessage();
+			LuaDLL.lua_pushboolean(L, o);
 			return 1;
 		}
 		catch(Exception e)
@@ -149,13 +196,28 @@ public class NetworkManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_IsConnect(IntPtr L)
+	static int GetHeartBeatMessage(IntPtr L)
 	{
 		try
 		{
-			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
-			NetworkManager.IsConnect = arg0;
-			return 0;
+			ToLua.CheckArgsCount(L, 0);
+			NetWorkMessage o = NetworkManager.GetHeartBeatMessage();
+			ToLua.PushValue(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_IsConnect(IntPtr L)
+	{
+		try
+		{
+			LuaDLL.lua_pushboolean(L, NetworkManager.IsConnect);
+			return 1;
 		}
 		catch(Exception e)
 		{

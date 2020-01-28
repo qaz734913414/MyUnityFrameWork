@@ -53,7 +53,10 @@ public class InputManager
         }
 
         Type typeArgument = Type.GetType(DispatcherName);
-
+        if (typeArgument == null)
+        {
+            throw new Exception(DispatcherName + " is not dont have class!");
+        }
         if (typeArgument.IsSubclassOf(typeof(IInputDispatcher)))
         {
             throw new Exception(DispatcherName + " is not IInputDispatcher subclass!");
@@ -83,7 +86,7 @@ public class InputManager
 
     static string m_DispatcherName;
     static IInputDispatcher dispatcher;
-    static IInputDispatcher GetDispatcher(string DispatcherName)
+    public static IInputDispatcher GetDispatcher(string DispatcherName)
     {
         if (s_dispatcher.TryGetValue(DispatcherName,out dispatcher))
         {
@@ -95,7 +98,7 @@ public class InputManager
         }
     }
 
-    static InputDispatcher<T> GetDispatcher<T>() where T : IInputEventBase
+    public static InputDispatcher<T> GetDispatcher<T>() where T : IInputEventBase
     {
         m_DispatcherName = typeof(T).Name;
 
@@ -145,6 +148,18 @@ public class InputManager
 
     #region AddListener
 
+    public static void AddAllEventListener(string eventName, InputEventCallBack callback)
+    {
+        IInputDispatcher dispatcher = GetDispatcher(eventName);
+        dispatcher.m_OnAllEventDispatch += callback;
+    }
+
+    public static void AddAllEventListener<T>(InputEventHandle<T> callback) where T : IInputEventBase
+    {
+        InputDispatcher<T> dispatcher = GetDispatcher<T>();
+        dispatcher.OnEventDispatch += callback;
+    }
+
     public static void AddListener(string eventName,string eventKey, InputEventHandle<IInputEventBase> callback)
     {
         IInputDispatcher dispatcher = GetDispatcher(eventName);
@@ -164,20 +179,27 @@ public class InputManager
         dispatcher.AddListener(typeof(T).Name, callback);
     }
 
-    ///// <summary>
-    ///// 添加一个输入事件监听，只有当事件是自定义的操作事件才可以调用这个方法
-    ///// </summary>
-    ///// <typeparam name="T"></typeparam>
-    ///// <param name="callback"></param>
-    //public static void AddListener<T>(InputEventHandle<T> callback) where T : IInputOperationEventBase
-    //{
-    //    InputDispatcher<T> dispatcher = GetDispatcher<T>();
-    //    dispatcher.AddListener(typeof(T).Name, callback);
-    //}
-
     #endregion
 
     #region RemoveListener
+
+    public static void RemoveAllEventListener<T>(InputEventHandle<T> callback) where T : IInputEventBase
+    {
+        InputDispatcher<T> dispatcher = GetDispatcher<T>();
+        dispatcher.OnEventDispatch -= callback;
+    }
+
+    public static void RemoveAllEventListener(string eventName, InputEventCallBack callback)
+    {
+        IInputDispatcher dispatcher = GetDispatcher(eventName);
+        dispatcher.m_OnAllEventDispatch -= callback;
+    }
+
+    public static void RemoveListener(string eventName, string eventKey, InputEventHandle<IInputEventBase> callback)
+    {
+        IInputDispatcher dispatcher = GetDispatcher(eventName);
+        dispatcher.RemoveListener(eventKey, callback);
+    }
 
     public static void RemoveListener<T>(string eventKey, InputEventHandle<T> callback) where T : IInputEventBase
     {

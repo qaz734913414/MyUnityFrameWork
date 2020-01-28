@@ -9,13 +9,14 @@ public class UIWindowLuaHelperWrap
 		L.BeginClass(typeof(UIWindowLuaHelper), typeof(UIWindowBase));
 		L.RegFunction("OnInit", OnInit);
 		L.RegFunction("OnOpen", OnOpen);
+		L.RegFunction("OnShow", OnShow);
+		L.RegFunction("OnHide", OnHide);
 		L.RegFunction("EnterAnim", EnterAnim);
 		L.RegFunction("OnCompleteEnterAnim", OnCompleteEnterAnim);
 		L.RegFunction("OnRefresh", OnRefresh);
 		L.RegFunction("OnClose", OnClose);
 		L.RegFunction("ExitAnim", ExitAnim);
 		L.RegFunction("OnCompleteExitAnim", OnCompleteExitAnim);
-		L.RegFunction("OnDestroy", OnDestroy);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.EndClass();
@@ -45,6 +46,38 @@ public class UIWindowLuaHelperWrap
 			ToLua.CheckArgsCount(L, 1);
 			UIWindowLuaHelper obj = (UIWindowLuaHelper)ToLua.CheckObject(L, 1, typeof(UIWindowLuaHelper));
 			obj.OnOpen();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int OnShow(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIWindowLuaHelper obj = (UIWindowLuaHelper)ToLua.CheckObject(L, 1, typeof(UIWindowLuaHelper));
+			obj.OnShow();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int OnHide(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIWindowLuaHelper obj = (UIWindowLuaHelper)ToLua.CheckObject(L, 1, typeof(UIWindowLuaHelper));
+			obj.OnHide();
 			return 0;
 		}
 		catch(Exception e)
@@ -197,22 +230,6 @@ public class UIWindowLuaHelperWrap
 			ToLua.CheckArgsCount(L, 1);
 			UIWindowLuaHelper obj = (UIWindowLuaHelper)ToLua.CheckObject(L, 1, typeof(UIWindowLuaHelper));
 			obj.OnCompleteExitAnim();
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int OnDestroy(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 1);
-			UIWindowLuaHelper obj = (UIWindowLuaHelper)ToLua.CheckObject(L, 1, typeof(UIWindowLuaHelper));
-			obj.OnDestroy();
 			return 0;
 		}
 		catch(Exception e)

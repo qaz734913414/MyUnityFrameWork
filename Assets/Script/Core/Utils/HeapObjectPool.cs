@@ -1,168 +1,94 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
+using System.Reflection;
 
 public class HeapObjectPool
 {
     #region string, object字典
 
-    const int c_SODictSize = 50;
-    static Dictionary<string, object>[] s_SODict;
-    static int s_SODictIndex = 0;
-
-    /// <summary>
-    /// 获取string, object字典
-    /// </summary>
-    /// <returns></returns>
     public static Dictionary<string, object> GetSODict()
     {
-        InitSODict();
-        Dictionary<string, object> dict = s_SODict[s_SODictIndex];
+        return HeapObjectPool<Dictionary<string, object>>.GetObject();
+    }
+
+    public static void PutSODict(Dictionary<string, object> dict)
+    {
         dict.Clear();
-
-        s_SODictIndex++;
-
-        if (s_SODictIndex >= s_SODict.Length)
-        {
-            s_SODictIndex = 0;
-        }
-
-        return dict;
+        HeapObjectPool<Dictionary<string, object>>.PutObject(dict);
     }
-
-    static void InitSODict()
-    {
-        if (s_SODict == null)
-        {
-            s_SODict = new Dictionary<string, object>[c_SODictSize];
-            for (int i = 0; i < c_SODictSize; i++)
-            {
-                s_SODict[i] = new Dictionary<string, object>();
-            }
-        }
-    }
-
-    #endregion
-
-    #region object列表
-
-    const int c_ObjListSize = 20;
-    const int c_PlayerInfoListSize = 20;
-    static List<object>[] s_ObjListPool;
-    static List<PlayerInfo>[] s_PlayerInfoListPool;
-    static int s_ObjListIndex = 0;
-    static int s_PlayerInfoListIndex = 0;
-
-    /// <summary>
-    /// 获取string, object字典
-    /// </summary>
-    /// <returns></returns>
-    public static List<object> GetObjList()
-    {
-        InitObjList();
-        List<object> dict = s_ObjListPool[s_ObjListIndex];
-        dict.Clear();
-
-        s_ObjListIndex++;
-
-        if (s_ObjListIndex >= s_ObjListPool.Length)
-        {
-            s_ObjListIndex = 0;
-        }
-
-        return dict;
-    }
-
-    public static List<PlayerInfo> GetPlayerInfoList()
-    {
-        InitPlayerInfoList();
-        List<PlayerInfo> dict = s_PlayerInfoListPool[s_PlayerInfoListIndex];
-        dict.Clear();
-
-        s_PlayerInfoListIndex++;
-
-        if (s_PlayerInfoListIndex >= s_PlayerInfoListPool.Length)
-        {
-            s_PlayerInfoListIndex = 0;
-        }
-
-        return dict;
-    }
-
-    static void InitObjList()
-    {
-        if (s_ObjListPool == null)
-        {
-            s_ObjListPool = new List<object>[c_ObjListSize];
-            for (int i = 0; i < c_SODictSize; i++)
-            {
-                s_ObjListPool[i] = new List<object>();
-            }
-        }
-    }
-
-    static void InitPlayerInfoList()
-    {
-        if (s_PlayerInfoListPool == null)
-        {
-            s_PlayerInfoListPool = new List<PlayerInfo>[c_PlayerInfoListSize];
-            for (int i = 0; i < c_PlayerInfoListSize; i++)
-            {
-                s_PlayerInfoListPool[i] = new List<PlayerInfo>();
-            }
-        }
-    }
-
-    #endregion
-
-    #region Mini Josn 优化
 
     #endregion
 }
 
-#region HeapObjectPool
-
-public class HeapObjectPoolTool<T> where T : new()
+    #region HeapObject
+public interface IHeapObjectInterface
 {
-    static T[] s_pool;
-    static int s_poolIndex = 0;
-    static int s_size = 20;
+    void OnInit();
 
-    public static void SetSize(int size)
+    /// <summary>
+    /// 取出时调用
+    /// </summary>
+    void OnPop();
+
+    /// <summary>
+    /// 放回时调用
+    /// </summary>
+    void OnPush();
+}
+
+#endregion
+
+    #region HeapObjectPool
+
+public static class HeapObjectPool<T> where T : new()
+{
+    static Stack<T> s_pool = new Stack<T>();
+
+    public static int GetCount()
     {
-        if (s_size != size)
-        {
-            s_size = size;
-            Init();
-        }
+        return s_pool.Count;
     }
 
-    static void Init()
+    public static T GetObject()
     {
-        s_pool = new T[s_size];
-        for (int i = 0; i < s_size; i++)
+        T obj;
+        IHeapObjectInterface heapObj;
+
+        if (s_pool.Count >0)
         {
-            s_pool[i] = new T();
+            obj = s_pool.Pop();
+            heapObj = obj as IHeapObjectInterface;
         }
-    }
-
-    public static T GetHeapObject()
-    {
-        if (s_pool == null)
+        else
         {
-            Init();
+            obj = new T();
+            heapObj = obj as IHeapObjectInterface;
+            if(heapObj != null)
+            {
+                heapObj.OnInit();
+            }
         }
 
-        T obj = s_pool[s_poolIndex];
-
-        s_poolIndex++;
-
-        if (s_poolIndex >= s_pool.Length)
+        if (heapObj != null)
         {
-            s_poolIndex = 0;
+            heapObj.OnPop();
         }
 
         return obj;
+    }
+
+    public static void PutObject(T obj)
+    {
+        IHeapObjectInterface heapObj = obj as IHeapObjectInterface;
+
+        if (heapObj != null)
+        {
+            heapObj.OnPush();
+        }
+
+        s_pool.Push(obj);
     }
 }
 

@@ -3,6 +3,7 @@ using System.Collections;
 
 public class UIEventCallBackHelper 
 {
+#if USE_LUA
     public static void CallOnUIInit(UIWindowBase UI)
     {
         LuaManager.LuaState.GetFunction("LuaUIManager.UIOnInit").Call(UI);
@@ -11,6 +12,16 @@ public class UIEventCallBackHelper
     public static void CallOnUIOpen(UIWindowBase UI)
     {
         LuaManager.LuaState.GetFunction("LuaUIManager.UIOnOpen").Call(UI);
+    }
+
+    public static void CallOnUIShow(UIWindowBase UI)
+    {
+        LuaManager.LuaState.GetFunction("LuaUIManager.UIOnShow").Call(UI);
+    }
+
+    public static void CallOnUIHide(UIWindowBase UI)
+    {
+        LuaManager.LuaState.GetFunction("LuaUIManager.UIOnHide").Call(UI);
     }
 
     public static double CallOnEnterAnim(UIWindowBase UI)
@@ -46,4 +57,6 @@ public class UIEventCallBackHelper
     {
         LuaManager.LuaState.GetFunction("LuaUIManager.UIOnDestroy").Call(UI);
     }
+
+#endif
 }

@@ -1,0 +1,5 @@
+key	serverIP	description	port	androidVersion	iosVersion	channel
+type	String	String	Int	StringArray	StringArray	StringArray
+note	服务器IP	描述	端口	支持前端Android的版本	支持的前端IOS的版本	包的渠道
+default	114.215.131.149	描述	8000	null	null	GameCenter
+1	192.168.1.1	测试		1.3.0		

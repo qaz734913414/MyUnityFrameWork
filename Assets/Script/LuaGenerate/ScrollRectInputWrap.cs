@@ -8,6 +8,7 @@ public class ScrollRectInputWrap
 	{
 		L.BeginClass(typeof(ScrollRectInput), typeof(UnityEngine.UI.ScrollRect));
 		L.RegFunction("Init", Init);
+		L.RegFunction("Dispose", Dispose);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("m_UIEventKey", get_m_UIEventKey, set_m_UIEventKey);
@@ -19,10 +20,27 @@ public class ScrollRectInputWrap
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 2);
+			ToLua.CheckArgsCount(L, 3);
 			ScrollRectInput obj = (ScrollRectInput)ToLua.CheckObject(L, 1, typeof(ScrollRectInput));
 			string arg0 = ToLua.CheckString(L, 2);
-			obj.Init(arg0);
+			int arg1 = (int)LuaDLL.luaL_checknumber(L, 3);
+			obj.Init(arg0, arg1);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int Dispose(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			ScrollRectInput obj = (ScrollRectInput)ToLua.CheckObject(L, 1, typeof(ScrollRectInput));
+			obj.Dispose();
 			return 0;
 		}
 		catch(Exception e)

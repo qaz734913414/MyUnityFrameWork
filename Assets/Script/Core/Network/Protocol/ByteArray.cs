@@ -4,43 +4,49 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using UnityEngine;
+
 public class ByteArray
 {
-    private List<byte> bytes = new List<byte>();
-    //private MemoryStream m_Stream = new MemoryStream();
-    //private BinaryReader m_Reader = null;
-    //private BinaryWriter m_Writer = null;
-    public ByteArray()
+    private List<byte> bytes;
+
+    public List<byte> Bytes
     {
-    }
-    public ByteArray(byte[] buffer)
-    {
-        for (int i = 0; i < buffer.Length; i++)
+        get
         {
-            bytes.Add(buffer[i]);
+            if(bytes == null)
+            {
+                bytes = new List<byte>();
+            }
+
+            return bytes;
+        }
+
+        set
+        {
+            bytes = value;
         }
     }
 
-    public ByteArray(MemoryStream ms)
+    public void Add(byte[] buffer)
     {
-        //m_Stream = ms;
-        Init();
-    }
-    private void Init()
-    {
-        //m_Writer = new BinaryWriter(m_Stream);
-        //m_Reader = new BinaryReader(m_Stream);
+        for (int i = 0; i < buffer.Length; i++)
+        {
+            Bytes.Add(buffer[i]);
+        }
     }
 
     public int Length
     {
         get {
-            return bytes.Count;
+            return Bytes.Count;
            }
     }
     public void clear()
     {
-        bytes.Clear();
+
+        Postion = 0;
+        Bytes.Clear();
     }
     public int Postion
     {
@@ -49,17 +55,23 @@ public class ByteArray
     }
     public byte[] Buffer
     {
-        get { return bytes.ToArray(); }
+        get 
+        { 
+            return Bytes.ToArray(); 
+        }
     }
+
+
+
     public bool ReadBoolean()
     {
-        byte b = bytes[Postion];
+        byte b = Bytes[Postion];
         Postion += 1;
         return b == (byte)0 ? false : true;
     }
     public byte ReadByte()
     {
-        byte result = bytes[Postion];
+        byte result = Bytes[Postion];
         Postion += 1;
         return result;
     }
@@ -68,119 +80,139 @@ public class ByteArray
         byte[] result = new byte[len];
         for (int i = 0; i < len; i++)
         {
-            result[i] = bytes[i + Postion];
+            result[i] = Bytes[i + Postion];
         }
         Postion += len;
         return result;
     }
-    public void addpos(int len)
-    {
-        Postion += len;
-    }
-    public int getpos()
-    {
-        return Postion;
-    }
+
     public void WriteInt(int value)
     {
-        byte[] bs = new byte[4];
-        bs[0] = (byte)(value >> 24);
-        bs[1] = (byte)(value >> 16);
-        bs[2] = (byte)(value >> 8);
-        bs[3] = (byte)(value);
-        bytes.AddRange(bs);
+        Bytes.Add((byte)(value >> 24));
+        Bytes.Add((byte)(value >> 16));
+        Bytes.Add((byte)(value >> 8));
+        Bytes.Add((byte)(value));
     }
     public void WriteShort(int value)
     {
-        byte[] bs = new byte[2];
-        bs[0] = (byte)(value >> 8);
-        bs[1] = (byte)(value);
-        bytes.AddRange(bs);
+        short tmp = (short)value;
+
+        Bytes.Add((byte)(tmp >> 8));
+        Bytes.Add((byte)(tmp));
     }
-    public int ReadInt()
+
+    public void WriteInt8(int value)
     {
-        byte[] bs = new byte[4];
-        for (int i = 0; i < 4; i++)
-        {
-            bs[i] = bytes[i + Postion];
-        }
+        Bytes.Add((byte)(value));
+    }
+
+    public int ReadUInt()
+    {
+        int result = Bytes[3 + Postion] | (Bytes[2 + Postion] << 8) | (Bytes[1 + Postion] << 16) | (Bytes[0 + Postion] << 24);
         Postion += 4;
-        int result = (int)bs[3] | ((int)bs[2] << 8) | ((int)bs[1] << 16) | ((int)bs[0] << 24);
         return result;
     }
-    public int ReadShort()
+    public int ReadUShort()
     {
-        byte[] bs = new byte[2];
-        for (int i = 0; i < 2; i++)
-        {
-            bs[i] = bytes[i + Postion];
-        }
+        int result = Bytes[1 + Postion] | Bytes[Postion] << 8;
         Postion += 2;
-        int result = (int)bs[1] | ((int)bs[0] << 8);
+
         return result;
     }
+
+    static byte[] int32Cache = new byte[4];
+    public int ReadInt32()
+    {
+        int32Cache[3] = Bytes[Postion];
+        int32Cache[2] = Bytes[Postion + 1];
+        int32Cache[1] = Bytes[Postion + 2];
+        int32Cache[0] = Bytes[Postion + 3];
+
+        int result = BitConverter.ToInt32(int32Cache, 0);
+        Postion += 4;
+        return result;
+    }
+
+    static byte[] int16Catch = new byte[2];
+    public int ReadInt16()
+    {
+        int16Catch[1] = Bytes[Postion];
+        int16Catch[0] = Bytes[Postion + 1];
+
+        int result = BitConverter.ToInt16(int16Catch, 0);
+        Postion += 2;
+        return result;
+    }
+
+    public int ReadInt8()
+    {
+        int result = Bytes[Postion];
+        Postion += 1;
+        return result;
+    }
+
+    static byte[] b = new byte[8];
     public double ReadDouble()
     {
-        byte[] b = new byte[8];
         for (int i = 0; i < 8; i++)
         {
-            b[i] = bytes[i + Postion];
+            b[7 - i] = Bytes[i + Postion];
         }
         Postion += 8;
-        Array.Reverse(b);
-        double dbl = BitConverter.ToDouble(b, 0);
-        return dbl;
+        return  BitConverter.ToDouble(b, 0);
     }
     public string ReadUTFBytes(uint length)
     {
         if (length == 0)
             return string.Empty;
+
         byte[] b = new byte[length];
         for (int i = 0; i < length; i++)
         {
-            b[i] = bytes[i + Postion];
+            b[i] = Bytes[i + Postion];
         }
         Postion += (int)length;
+
         string decodedString = Encoding.UTF8.GetString(b);
         return decodedString;
     }
-    public void WriteUTFBytes(string value)
-    {
-        byte[] bs = Encoding.UTF8.GetBytes(value);
-        bytes.AddRange(bs);
-    }
+
     public void WriteALLBytes(byte[] bs)
     {
-        bytes.AddRange(bs);
+        Bytes.AddRange(bs);
     }
-    public void WriteNullBytes(int num)
-    {
-        byte[] bs = new byte[num];
-        bytes.AddRange(bs);
-    }
+
     public void WriteBoolean(bool value)
     {
-        bytes.Add(value ? ((byte)1) : ((byte)0));
+        Bytes.Add(value ? ((byte)1) : ((byte)0));
     }
+
     public void WriteByte(byte value)
     {
-        bytes.Add(value);
+        Bytes.Add(value);
     }
-    public void WriteBytes(byte[] value, int offset, int length)
-    {
-        for (int i = 0; i < length; i++)
-        {
-            bytes.Add(value[i + offset]);
-        }
-    }
-    public void WriteBytes(byte[] value)
-    {
-        bytes.AddRange(value);
-    }
+
     public void WriteDouble(double v)
     {
         byte[] temp = BitConverter.GetBytes(v);
-        Array.Reverse(temp);
-        bytes.AddRange(temp);
+
+        for (int i = 0; i < 8; i++)
+        {
+            b[7 - i] = temp[i];
+        }
+
+        Bytes.AddRange(b);
+    }
+
+    public void WriteString(string content)
+    {
+        if(content == null)
+        {
+            content = "";
+        }
+
+        byte[] bs = Encoding.UTF8.GetBytes(content);
+        WriteShort(bs.Length);
+        WriteALLBytes(bs);
     }
 }

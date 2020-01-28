@@ -8,24 +8,38 @@ public class UIManagerWrap
 	{
 		L.BeginClass(typeof(UIManager), typeof(UnityEngine.MonoBehaviour));
 		L.RegFunction("Init", Init);
+		L.RegFunction("SetEventSystemEnable", SetEventSystemEnable);
+		L.RegFunction("GetCameraNames", GetCameraNames);
+		L.RegFunction("GetCamera", GetCamera);
+		L.RegFunction("ChangeUICamera", ChangeUICamera);
+		L.RegFunction("ResetUICamera", ResetUICamera);
 		L.RegFunction("CreateUIWindow", CreateUIWindow);
 		L.RegFunction("OpenUIWindow", OpenUIWindow);
 		L.RegFunction("CloseUIWindow", CloseUIWindow);
+		L.RegFunction("ShowUI", ShowUI);
+		L.RegFunction("HideUI", HideUI);
+		L.RegFunction("HideOtherUI", HideOtherUI);
+		L.RegFunction("ShowOtherUI", ShowOtherUI);
 		L.RegFunction("CloseAllUI", CloseAllUI);
+		L.RegFunction("CloseLastUI", CloseLastUI);
+		L.RegFunction("OpenUIAsync", OpenUIAsync);
 		L.RegFunction("DestroyUI", DestroyUI);
 		L.RegFunction("DestroyAllUI", DestroyAllUI);
 		L.RegFunction("DestroyAllActiveUI", DestroyAllActiveUI);
 		L.RegFunction("GetUI", GetUI);
+		L.RegFunction("GetUIBaseByEventKey", GetUIBaseByEventKey);
+		L.RegFunction("GetNormalUICount", GetNormalUICount);
 		L.RegFunction("DestroyAllHideUI", DestroyAllHideUI);
 		L.RegFunction("GetHideUI", GetHideUI);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
-		L.RegVar("s_UIManagerGo", get_s_UIManagerGo, set_s_UIManagerGo);
-		L.RegVar("s_UILayerManager", get_s_UILayerManager, set_s_UILayerManager);
-		L.RegVar("s_UIAnimManager", get_s_UIAnimManager, set_s_UIAnimManager);
-		L.RegVar("s_UIcamera", get_s_UIcamera, set_s_UIcamera);
 		L.RegVar("s_UIs", get_s_UIs, set_s_UIs);
 		L.RegVar("s_hideUIs", get_s_hideUIs, set_s_hideUIs);
+		L.RegVar("UILayerManager", get_UILayerManager, set_UILayerManager);
+		L.RegVar("UIAnimManager", get_UIAnimManager, set_UIAnimManager);
+		L.RegVar("UIStackManager", get_UIStackManager, set_UIStackManager);
+		L.RegVar("EventSystem", get_EventSystem, set_EventSystem);
+		L.RegVar("UIManagerGo", get_UIManagerGo, set_UIManagerGo);
 		L.EndClass();
 	}
 
@@ -36,6 +50,88 @@ public class UIManagerWrap
 		{
 			ToLua.CheckArgsCount(L, 0);
 			UIManager.Init();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int SetEventSystemEnable(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			bool arg0 = LuaDLL.luaL_checkboolean(L, 1);
+			UIManager.SetEventSystemEnable(arg0);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetCameraNames(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 0);
+			string[] o = UIManager.GetCameraNames();
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetCamera(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			string arg0 = ToLua.CheckString(L, 1);
+			UnityEngine.Camera o = UIManager.GetCamera(arg0);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int ChangeUICamera(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			UIWindowBase arg0 = (UIWindowBase)ToLua.CheckUnityObject(L, 1, typeof(UIWindowBase));
+			string arg1 = ToLua.CheckString(L, 2);
+			UIManager.ChangeUICamera(arg0, arg1);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int ResetUICamera(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIWindowBase arg0 = (UIWindowBase)ToLua.CheckUnityObject(L, 1, typeof(UIWindowBase));
+			UIManager.ResetUICamera(arg0);
 			return 0;
 		}
 		catch(Exception e)
@@ -153,6 +249,102 @@ public class UIManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int ShowUI(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(UIWindowBase)))
+			{
+				UIWindowBase arg0 = (UIWindowBase)ToLua.ToObject(L, 1);
+				UIWindowBase o = UIManager.ShowUI(arg0);
+				ToLua.Push(L, o);
+				return 1;
+			}
+			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(string)))
+			{
+				string arg0 = ToLua.ToString(L, 1);
+				UIWindowBase o = UIManager.ShowUI(arg0);
+				ToLua.Push(L, o);
+				return 1;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: UIManager.ShowUI");
+			}
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int HideUI(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(UIWindowBase)))
+			{
+				UIWindowBase arg0 = (UIWindowBase)ToLua.ToObject(L, 1);
+				UIWindowBase o = UIManager.HideUI(arg0);
+				ToLua.Push(L, o);
+				return 1;
+			}
+			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(string)))
+			{
+				string arg0 = ToLua.ToString(L, 1);
+				UIWindowBase o = UIManager.HideUI(arg0);
+				ToLua.Push(L, o);
+				return 1;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: UIManager.HideUI");
+			}
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int HideOtherUI(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			string arg0 = ToLua.CheckString(L, 1);
+			UIManager.HideOtherUI(arg0);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int ShowOtherUI(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			string arg0 = ToLua.CheckString(L, 1);
+			UIManager.ShowOtherUI(arg0);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int CloseAllUI(IntPtr L)
 	{
 		try
@@ -160,6 +352,52 @@ public class UIManagerWrap
 			ToLua.CheckArgsCount(L, 1);
 			bool arg0 = LuaDLL.luaL_checkboolean(L, 1);
 			UIManager.CloseAllUI(arg0);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int CloseLastUI(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIType arg0 = (UIType)ToLua.CheckObject(L, 1, typeof(UIType));
+			UIManager.CloseLastUI(arg0);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int OpenUIAsync(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			string arg0 = ToLua.CheckString(L, 1);
+			UICallBack arg1 = null;
+			LuaTypes funcType2 = LuaDLL.lua_type(L, 2);
+
+			if (funcType2 != LuaTypes.LUA_TFUNCTION)
+			{
+				 arg1 = (UICallBack)ToLua.CheckObject(L, 2, typeof(UICallBack));
+			}
+			else
+			{
+				LuaFunction func = ToLua.ToLuaFunction(L, 2);
+				arg1 = DelegateFactory.CreateDelegate(typeof(UICallBack), func) as UICallBack;
+			}
+
+			object[] arg2 = ToLua.ToParamsObject(L, 3, count - 2);
+			UIManager.OpenUIAsync(arg0, arg1, arg2);
 			return 0;
 		}
 		catch(Exception e)
@@ -232,6 +470,39 @@ public class UIManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetUIBaseByEventKey(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			string arg0 = ToLua.CheckString(L, 1);
+			UIBase o = UIManager.GetUIBaseByEventKey(arg0);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetNormalUICount(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 0);
+			int o = UIManager.GetNormalUICount();
+			LuaDLL.lua_pushinteger(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int DestroyAllHideUI(IntPtr L)
 	{
 		try
@@ -282,62 +553,6 @@ public class UIManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_s_UIManagerGo(IntPtr L)
-	{
-		try
-		{
-			ToLua.Push(L, UIManager.s_UIManagerGo);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_s_UILayerManager(IntPtr L)
-	{
-		try
-		{
-			ToLua.Push(L, UIManager.s_UILayerManager);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_s_UIAnimManager(IntPtr L)
-	{
-		try
-		{
-			ToLua.Push(L, UIManager.s_UIAnimManager);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_s_UIcamera(IntPtr L)
-	{
-		try
-		{
-			ToLua.Push(L, UIManager.s_UIcamera);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_s_UIs(IntPtr L)
 	{
 		try
@@ -366,13 +581,12 @@ public class UIManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_s_UIManagerGo(IntPtr L)
+	static int get_UILayerManager(IntPtr L)
 	{
 		try
 		{
-			UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 2, typeof(UnityEngine.GameObject));
-			UIManager.s_UIManagerGo = arg0;
-			return 0;
+			ToLua.Push(L, UIManager.UILayerManager);
+			return 1;
 		}
 		catch(Exception e)
 		{
@@ -381,13 +595,12 @@ public class UIManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_s_UILayerManager(IntPtr L)
+	static int get_UIAnimManager(IntPtr L)
 	{
 		try
 		{
-			UILayerManager arg0 = (UILayerManager)ToLua.CheckUnityObject(L, 2, typeof(UILayerManager));
-			UIManager.s_UILayerManager = arg0;
-			return 0;
+			ToLua.Push(L, UIManager.UIAnimManager);
+			return 1;
 		}
 		catch(Exception e)
 		{
@@ -396,13 +609,12 @@ public class UIManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_s_UIAnimManager(IntPtr L)
+	static int get_UIStackManager(IntPtr L)
 	{
 		try
 		{
-			UIAnimManager arg0 = (UIAnimManager)ToLua.CheckUnityObject(L, 2, typeof(UIAnimManager));
-			UIManager.s_UIAnimManager = arg0;
-			return 0;
+			ToLua.Push(L, UIManager.UIStackManager);
+			return 1;
 		}
 		catch(Exception e)
 		{
@@ -411,13 +623,26 @@ public class UIManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_s_UIcamera(IntPtr L)
+	static int get_EventSystem(IntPtr L)
 	{
 		try
 		{
-			UnityEngine.Camera arg0 = (UnityEngine.Camera)ToLua.CheckUnityObject(L, 2, typeof(UnityEngine.Camera));
-			UIManager.s_UIcamera = arg0;
-			return 0;
+			ToLua.Push(L, UIManager.EventSystem);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_UIManagerGo(IntPtr L)
+	{
+		try
+		{
+			ToLua.Push(L, UIManager.UIManagerGo);
+			return 1;
 		}
 		catch(Exception e)
 		{
@@ -447,6 +672,81 @@ public class UIManagerWrap
 		{
 			System.Collections.Generic.Dictionary<string,System.Collections.Generic.List<UIWindowBase>> arg0 = (System.Collections.Generic.Dictionary<string,System.Collections.Generic.List<UIWindowBase>>)ToLua.CheckObject(L, 2, typeof(System.Collections.Generic.Dictionary<string,System.Collections.Generic.List<UIWindowBase>>));
 			UIManager.s_hideUIs = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_UILayerManager(IntPtr L)
+	{
+		try
+		{
+			UILayerManager arg0 = (UILayerManager)ToLua.CheckUnityObject(L, 2, typeof(UILayerManager));
+			UIManager.UILayerManager = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_UIAnimManager(IntPtr L)
+	{
+		try
+		{
+			UIAnimManager arg0 = (UIAnimManager)ToLua.CheckUnityObject(L, 2, typeof(UIAnimManager));
+			UIManager.UIAnimManager = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_UIStackManager(IntPtr L)
+	{
+		try
+		{
+			UIStackManager arg0 = (UIStackManager)ToLua.CheckUnityObject(L, 2, typeof(UIStackManager));
+			UIManager.UIStackManager = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_EventSystem(IntPtr L)
+	{
+		try
+		{
+			UnityEngine.EventSystems.EventSystem arg0 = (UnityEngine.EventSystems.EventSystem)ToLua.CheckUnityObject(L, 2, typeof(UnityEngine.EventSystems.EventSystem));
+			UIManager.EventSystem = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_UIManagerGo(IntPtr L)
+	{
+		try
+		{
+			UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 2, typeof(UnityEngine.GameObject));
+			UIManager.UIManagerGo = arg0;
 			return 0;
 		}
 		catch(Exception e)

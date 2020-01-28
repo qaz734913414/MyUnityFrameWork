@@ -7,16 +7,18 @@ public class AnimDataWrap
 	public static void Register(LuaState L)
 	{
 		L.BeginClass(typeof(AnimData), typeof(System.Object));
-		L.RegFunction("executeUpdate", executeUpdate);
-		L.RegFunction("executeCallBack", executeCallBack);
+		L.RegFunction("ExecuteUpdate", ExecuteUpdate);
+		L.RegFunction("ExecuteCallBack", ExecuteCallBack);
 		L.RegFunction("AnimReplayLogic", AnimReplayLogic);
 		L.RegFunction("ExchangeV2", ExchangeV2);
 		L.RegFunction("ExchangePos", ExchangePos);
 		L.RegFunction("ExchangeAlpha", ExchangeAlpha);
 		L.RegFunction("Init", Init);
+		L.RegFunction("OnInit", OnInit);
 		L.RegFunction("CustomMethodFloat", CustomMethodFloat);
 		L.RegFunction("CustomMethodVector2", CustomMethodVector2);
 		L.RegFunction("CustomMethodVector3", CustomMethodVector3);
+		L.RegFunction("CustomMethodVector4", CustomMethodVector4);
 		L.RegFunction("BezierInit", BezierInit);
 		L.RegFunction("UguiAlphaInit", UguiAlphaInit);
 		L.RegFunction("SetUGUIAlpha", SetUGUIAlpha);
@@ -37,6 +39,7 @@ public class AnimDataWrap
 		L.RegFunction("InCubic", InCubic);
 		L.RegFunction("OutCubic", OutCubic);
 		L.RegFunction("InoutCubic", InoutCubic);
+		L.RegFunction("OutinCubic", OutinCubic);
 		L.RegFunction("InQuart", InQuart);
 		L.RegFunction("OutQuart", OutQuart);
 		L.RegFunction("InOutQuart", InOutQuart);
@@ -53,6 +56,11 @@ public class AnimDataWrap
 		L.RegFunction("OutExpo", OutExpo);
 		L.RegFunction("InOutExpo", InOutExpo);
 		L.RegFunction("OutInExpo", OutInExpo);
+		L.RegFunction("OutBounce", OutBounce);
+		L.RegFunction("InBounce", InBounce);
+		L.RegFunction("InOutBounce", InOutBounce);
+		L.RegFunction("OutInBounce", OutInBounce);
+		L.RegFunction("ShowDebug", ShowDebug);
 		L.RegFunction("New", _CreateAnimData);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("m_animGameObejct", get_m_animGameObejct, set_m_animGameObejct);
@@ -66,12 +74,17 @@ public class AnimDataWrap
 		L.RegVar("m_currentTime", get_m_currentTime, set_m_currentTime);
 		L.RegVar("m_totalTime", get_m_totalTime, set_m_totalTime);
 		L.RegVar("m_repeatCount", get_m_repeatCount, set_m_repeatCount);
+		L.RegVar("m_fromQ4", get_m_fromQ4, set_m_fromQ4);
+		L.RegVar("m_toQ4", get_m_toQ4, set_m_toQ4);
+		L.RegVar("m_fromV4", get_m_fromV4, set_m_fromV4);
+		L.RegVar("m_toV4", get_m_toV4, set_m_toV4);
 		L.RegVar("m_fromV3", get_m_fromV3, set_m_fromV3);
 		L.RegVar("m_toV3", get_m_toV3, set_m_toV3);
 		L.RegVar("m_fromV2", get_m_fromV2, set_m_fromV2);
 		L.RegVar("m_toV2", get_m_toV2, set_m_toV2);
 		L.RegVar("m_fromFloat", get_m_fromFloat, set_m_fromFloat);
 		L.RegVar("m_toFloat", get_m_toFloat, set_m_toFloat);
+		L.RegVar("m_toTransform", get_m_toTransform, set_m_toTransform);
 		L.RegVar("m_fromColor", get_m_fromColor, set_m_fromColor);
 		L.RegVar("m_toColor", get_m_toColor, set_m_toColor);
 		L.RegVar("m_parameter", get_m_parameter, set_m_parameter);
@@ -81,6 +94,7 @@ public class AnimDataWrap
 		L.RegVar("m_isLocal", get_m_isLocal, set_m_isLocal);
 		L.RegVar("m_v3Contral", get_m_v3Contral, set_m_v3Contral);
 		L.RegVar("m_floatContral", get_m_floatContral, set_m_floatContral);
+		L.RegVar("m_customMethodV4", get_m_customMethodV4, set_m_customMethodV4);
 		L.RegVar("m_customMethodV3", get_m_customMethodV3, set_m_customMethodV3);
 		L.RegVar("m_customMethodV2", get_m_customMethodV2, set_m_customMethodV2);
 		L.RegVar("m_customMethodFloat", get_m_customMethodFloat, set_m_customMethodFloat);
@@ -112,14 +126,15 @@ public class AnimDataWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int executeUpdate(IntPtr L)
+	static int ExecuteUpdate(IntPtr L)
 	{
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
 			AnimData obj = (AnimData)ToLua.CheckObject(L, 1, typeof(AnimData));
-			obj.executeUpdate();
-			return 0;
+			bool o = obj.ExecuteUpdate();
+			LuaDLL.lua_pushboolean(L, o);
+			return 1;
 		}
 		catch(Exception e)
 		{
@@ -128,13 +143,13 @@ public class AnimDataWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int executeCallBack(IntPtr L)
+	static int ExecuteCallBack(IntPtr L)
 	{
 		try
 		{
 			ToLua.CheckArgsCount(L, 1);
 			AnimData obj = (AnimData)ToLua.CheckObject(L, 1, typeof(AnimData));
-			obj.executeCallBack();
+			obj.ExecuteCallBack();
 			return 0;
 		}
 		catch(Exception e)
@@ -225,6 +240,22 @@ public class AnimDataWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int OnInit(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			AnimData obj = (AnimData)ToLua.CheckObject(L, 1, typeof(AnimData));
+			obj.OnInit();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int CustomMethodFloat(IntPtr L)
 	{
 		try
@@ -264,6 +295,22 @@ public class AnimDataWrap
 			ToLua.CheckArgsCount(L, 1);
 			AnimData obj = (AnimData)ToLua.CheckObject(L, 1, typeof(AnimData));
 			obj.CustomMethodVector3();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int CustomMethodVector4(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			AnimData obj = (AnimData)ToLua.CheckObject(L, 1, typeof(AnimData));
+			obj.CustomMethodVector4();
 			return 0;
 		}
 		catch(Exception e)
@@ -429,7 +476,7 @@ public class AnimDataWrap
 		{
 			ToLua.CheckArgsCount(L, 2);
 			AnimData obj = (AnimData)ToLua.CheckObject(L, 1, typeof(AnimData));
-			UnityEngine.Color arg0 = ToLua.ToColor(L, 2);
+			UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.CheckObject(L, 2, typeof(UnityEngine.Color));
 			obj.SetColor(arg0);
 			return 0;
 		}
@@ -643,6 +690,27 @@ public class AnimDataWrap
 			float arg2 = (float)LuaDLL.luaL_checknumber(L, 4);
 			float arg3 = (float)LuaDLL.luaL_checknumber(L, 5);
 			float o = obj.InoutCubic(arg0, arg1, arg2, arg3);
+			LuaDLL.lua_pushnumber(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int OutinCubic(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 5);
+			AnimData obj = (AnimData)ToLua.CheckObject(L, 1, typeof(AnimData));
+			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
+			float arg1 = (float)LuaDLL.luaL_checknumber(L, 3);
+			float arg2 = (float)LuaDLL.luaL_checknumber(L, 4);
+			float arg3 = (float)LuaDLL.luaL_checknumber(L, 5);
+			float o = obj.OutinCubic(arg0, arg1, arg2, arg3);
 			LuaDLL.lua_pushnumber(L, o);
 			return 1;
 		}
@@ -989,6 +1057,106 @@ public class AnimDataWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int OutBounce(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 5);
+			AnimData obj = (AnimData)ToLua.CheckObject(L, 1, typeof(AnimData));
+			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
+			float arg1 = (float)LuaDLL.luaL_checknumber(L, 3);
+			float arg2 = (float)LuaDLL.luaL_checknumber(L, 4);
+			float arg3 = (float)LuaDLL.luaL_checknumber(L, 5);
+			float o = obj.OutBounce(arg0, arg1, arg2, arg3);
+			LuaDLL.lua_pushnumber(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int InBounce(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 5);
+			AnimData obj = (AnimData)ToLua.CheckObject(L, 1, typeof(AnimData));
+			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
+			float arg1 = (float)LuaDLL.luaL_checknumber(L, 3);
+			float arg2 = (float)LuaDLL.luaL_checknumber(L, 4);
+			float arg3 = (float)LuaDLL.luaL_checknumber(L, 5);
+			float o = obj.InBounce(arg0, arg1, arg2, arg3);
+			LuaDLL.lua_pushnumber(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int InOutBounce(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 5);
+			AnimData obj = (AnimData)ToLua.CheckObject(L, 1, typeof(AnimData));
+			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
+			float arg1 = (float)LuaDLL.luaL_checknumber(L, 3);
+			float arg2 = (float)LuaDLL.luaL_checknumber(L, 4);
+			float arg3 = (float)LuaDLL.luaL_checknumber(L, 5);
+			float o = obj.InOutBounce(arg0, arg1, arg2, arg3);
+			LuaDLL.lua_pushnumber(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int OutInBounce(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 5);
+			AnimData obj = (AnimData)ToLua.CheckObject(L, 1, typeof(AnimData));
+			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
+			float arg1 = (float)LuaDLL.luaL_checknumber(L, 3);
+			float arg2 = (float)LuaDLL.luaL_checknumber(L, 4);
+			float arg3 = (float)LuaDLL.luaL_checknumber(L, 5);
+			float o = obj.OutInBounce(arg0, arg1, arg2, arg3);
+			LuaDLL.lua_pushnumber(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int ShowDebug(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			AnimData obj = (AnimData)ToLua.CheckObject(L, 1, typeof(AnimData));
+			obj.ShowDebug();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_m_animGameObejct(IntPtr L)
 	{
 		object o = null;
@@ -1198,6 +1366,82 @@ public class AnimDataWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_m_fromQ4(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			AnimData obj = (AnimData)o;
+			UnityEngine.Quaternion ret = obj.m_fromQ4;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_fromQ4 on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_m_toQ4(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			AnimData obj = (AnimData)o;
+			UnityEngine.Quaternion ret = obj.m_toQ4;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_toQ4 on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_m_fromV4(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			AnimData obj = (AnimData)o;
+			UnityEngine.Vector4 ret = obj.m_fromV4;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_fromV4 on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_m_toV4(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			AnimData obj = (AnimData)o;
+			UnityEngine.Vector4 ret = obj.m_toV4;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_toV4 on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_m_fromV3(IntPtr L)
 	{
 		object o = null;
@@ -1308,6 +1552,25 @@ public class AnimDataWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_toFloat on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_m_toTransform(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			AnimData obj = (AnimData)o;
+			UnityEngine.Transform ret = obj.m_toTransform;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_toTransform on a nil value" : e.Message);
 		}
 	}
 
@@ -1479,6 +1742,25 @@ public class AnimDataWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_floatContral on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_m_customMethodV4(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			AnimData obj = (AnimData)o;
+			AnimCustomMethodVector4 ret = obj.m_customMethodV4;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_customMethodV4 on a nil value" : e.Message);
 		}
 	}
 
@@ -1749,6 +2031,82 @@ public class AnimDataWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_m_fromQ4(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			AnimData obj = (AnimData)o;
+			UnityEngine.Quaternion arg0 = (UnityEngine.Quaternion)ToLua.CheckObject(L, 2, typeof(UnityEngine.Quaternion));
+			obj.m_fromQ4 = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_fromQ4 on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_m_toQ4(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			AnimData obj = (AnimData)o;
+			UnityEngine.Quaternion arg0 = (UnityEngine.Quaternion)ToLua.CheckObject(L, 2, typeof(UnityEngine.Quaternion));
+			obj.m_toQ4 = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_toQ4 on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_m_fromV4(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			AnimData obj = (AnimData)o;
+			UnityEngine.Vector4 arg0 = (UnityEngine.Vector4)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector4));
+			obj.m_fromV4 = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_fromV4 on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_m_toV4(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			AnimData obj = (AnimData)o;
+			UnityEngine.Vector4 arg0 = (UnityEngine.Vector4)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector4));
+			obj.m_toV4 = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_toV4 on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_m_fromV3(IntPtr L)
 	{
 		object o = null;
@@ -1757,7 +2115,7 @@ public class AnimDataWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			AnimData obj = (AnimData)o;
-			UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 2);
+			UnityEngine.Vector3 arg0 = (UnityEngine.Vector3)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector3));
 			obj.m_fromV3 = arg0;
 			return 0;
 		}
@@ -1776,7 +2134,7 @@ public class AnimDataWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			AnimData obj = (AnimData)o;
-			UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 2);
+			UnityEngine.Vector3 arg0 = (UnityEngine.Vector3)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector3));
 			obj.m_toV3 = arg0;
 			return 0;
 		}
@@ -1795,7 +2153,7 @@ public class AnimDataWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			AnimData obj = (AnimData)o;
-			UnityEngine.Vector2 arg0 = ToLua.ToVector2(L, 2);
+			UnityEngine.Vector2 arg0 = (UnityEngine.Vector2)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector2));
 			obj.m_fromV2 = arg0;
 			return 0;
 		}
@@ -1814,7 +2172,7 @@ public class AnimDataWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			AnimData obj = (AnimData)o;
-			UnityEngine.Vector2 arg0 = ToLua.ToVector2(L, 2);
+			UnityEngine.Vector2 arg0 = (UnityEngine.Vector2)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector2));
 			obj.m_toV2 = arg0;
 			return 0;
 		}
@@ -1863,6 +2221,25 @@ public class AnimDataWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_m_toTransform(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			AnimData obj = (AnimData)o;
+			UnityEngine.Transform arg0 = (UnityEngine.Transform)ToLua.CheckUnityObject(L, 2, typeof(UnityEngine.Transform));
+			obj.m_toTransform = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_toTransform on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_m_fromColor(IntPtr L)
 	{
 		object o = null;
@@ -1871,7 +2248,7 @@ public class AnimDataWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			AnimData obj = (AnimData)o;
-			UnityEngine.Color arg0 = ToLua.ToColor(L, 2);
+			UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.CheckObject(L, 2, typeof(UnityEngine.Color));
 			obj.m_fromColor = arg0;
 			return 0;
 		}
@@ -1890,7 +2267,7 @@ public class AnimDataWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			AnimData obj = (AnimData)o;
-			UnityEngine.Color arg0 = ToLua.ToColor(L, 2);
+			UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.CheckObject(L, 2, typeof(UnityEngine.Color));
 			obj.m_toColor = arg0;
 			return 0;
 		}
@@ -2042,6 +2419,37 @@ public class AnimDataWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_floatContral on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_m_customMethodV4(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			AnimData obj = (AnimData)o;
+			AnimCustomMethodVector4 arg0 = null;
+			LuaTypes funcType2 = LuaDLL.lua_type(L, 2);
+
+			if (funcType2 != LuaTypes.LUA_TFUNCTION)
+			{
+				 arg0 = (AnimCustomMethodVector4)ToLua.CheckObject(L, 2, typeof(AnimCustomMethodVector4));
+			}
+			else
+			{
+				LuaFunction func = ToLua.ToLuaFunction(L, 2);
+				arg0 = DelegateFactory.CreateDelegate(typeof(AnimCustomMethodVector4), func) as AnimCustomMethodVector4;
+			}
+
+			obj.m_customMethodV4 = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_customMethodV4 on a nil value" : e.Message);
 		}
 	}
 

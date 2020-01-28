@@ -8,17 +8,22 @@ public class SingleDataWrap
 	{
 		L.BeginClass(typeof(SingleData), typeof(System.Collections.Generic.Dictionary<string,string>));
 		L.RegFunction("GetInt", GetInt);
+		L.RegFunction("GetIntArray", GetIntArray);
 		L.RegFunction("GetFloat", GetFloat);
+		L.RegFunction("GetFloatArray", GetFloatArray);
 		L.RegFunction("GetBool", GetBool);
+		L.RegFunction("GetBoolArray", GetBoolArray);
 		L.RegFunction("GetString", GetString);
 		L.RegFunction("GetVector2", GetVector2);
+		L.RegFunction("GetVector2Array", GetVector2Array);
+		L.RegFunction("GetVector3Array", GetVector3Array);
 		L.RegFunction("GetVector3", GetVector3);
 		L.RegFunction("GetColor", GetColor);
 		L.RegFunction("GetStringArray", GetStringArray);
 		L.RegFunction("New", _CreateSingleData);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("data", get_data, set_data);
-		L.RegVar("m_SingleDataName", get_m_SingleDataName, set_m_SingleDataName);
+		L.RegVar("m_SingleDataKey", get_m_SingleDataKey, set_m_SingleDataKey);
 		L.EndClass();
 	}
 
@@ -65,6 +70,24 @@ public class SingleDataWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetIntArray(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			SingleData obj = (SingleData)ToLua.CheckObject(L, 1, typeof(SingleData));
+			string arg0 = ToLua.CheckString(L, 2);
+			int[] o = obj.GetIntArray(arg0);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int GetFloat(IntPtr L)
 	{
 		try
@@ -83,6 +106,24 @@ public class SingleDataWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetFloatArray(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			SingleData obj = (SingleData)ToLua.CheckObject(L, 1, typeof(SingleData));
+			string arg0 = ToLua.CheckString(L, 2);
+			float[] o = obj.GetFloatArray(arg0);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int GetBool(IntPtr L)
 	{
 		try
@@ -92,6 +133,24 @@ public class SingleDataWrap
 			string arg0 = ToLua.CheckString(L, 2);
 			bool o = obj.GetBool(arg0);
 			LuaDLL.lua_pushboolean(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetBoolArray(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			SingleData obj = (SingleData)ToLua.CheckObject(L, 1, typeof(SingleData));
+			string arg0 = ToLua.CheckString(L, 2);
+			bool[] o = obj.GetBoolArray(arg0);
+			ToLua.Push(L, o);
 			return 1;
 		}
 		catch(Exception e)
@@ -127,6 +186,42 @@ public class SingleDataWrap
 			SingleData obj = (SingleData)ToLua.CheckObject(L, 1, typeof(SingleData));
 			string arg0 = ToLua.CheckString(L, 2);
 			UnityEngine.Vector2 o = obj.GetVector2(arg0);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetVector2Array(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			SingleData obj = (SingleData)ToLua.CheckObject(L, 1, typeof(SingleData));
+			string arg0 = ToLua.CheckString(L, 2);
+			UnityEngine.Vector2[] o = obj.GetVector2Array(arg0);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetVector3Array(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			SingleData obj = (SingleData)ToLua.CheckObject(L, 1, typeof(SingleData));
+			string arg0 = ToLua.CheckString(L, 2);
+			UnityEngine.Vector3[] o = obj.GetVector3Array(arg0);
 			ToLua.Push(L, o);
 			return 1;
 		}
@@ -210,7 +305,7 @@ public class SingleDataWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_m_SingleDataName(IntPtr L)
+	static int get_m_SingleDataKey(IntPtr L)
 	{
 		object o = null;
 
@@ -218,13 +313,13 @@ public class SingleDataWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			SingleData obj = (SingleData)o;
-			string ret = obj.m_SingleDataName;
+			string ret = obj.m_SingleDataKey;
 			LuaDLL.lua_pushstring(L, ret);
 			return 1;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_SingleDataName on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_SingleDataKey on a nil value" : e.Message);
 		}
 	}
 
@@ -248,7 +343,7 @@ public class SingleDataWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_m_SingleDataName(IntPtr L)
+	static int set_m_SingleDataKey(IntPtr L)
 	{
 		object o = null;
 
@@ -257,12 +352,12 @@ public class SingleDataWrap
 			o = ToLua.ToObject(L, 1);
 			SingleData obj = (SingleData)o;
 			string arg0 = ToLua.CheckString(L, 2);
-			obj.m_SingleDataName = arg0;
+			obj.m_SingleDataKey = arg0;
 			return 0;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_SingleDataName on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_SingleDataKey on a nil value" : e.Message);
 		}
 	}
 }

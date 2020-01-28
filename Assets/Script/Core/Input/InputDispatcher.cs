@@ -12,11 +12,33 @@ public class InputDispatcher<Event> : IInputDispatcher where Event : IInputEvent
     /// </summary>
     public InputEventHandle<Event> OnEventDispatch;
 
+    /// <summary>
+    /// 基础输入类型和泛型输入类型在这里进行一次映射
+    /// </summary>
+    Dictionary<InputEventHandle<IInputEventBase>, InputEventHandle<Event>> m_ListenerHash = new Dictionary<InputEventHandle<IInputEventBase>, InputEventHandle<Event>>();
+
     public override void AddListener(string eventKey, InputEventHandle<IInputEventBase> callBack)
     {
-        AddListener(eventKey, (inputEvent) => {
+        InputEventHandle<Event> temp = (inputEvent) =>
+        {
             callBack((IInputEventBase)inputEvent);
-        });
+        };
+
+        m_ListenerHash.Add(callBack, temp);
+
+        AddListener(eventKey, temp);
+    }
+    public override void RemoveListener(string eventKey, InputEventHandle<IInputEventBase> callBack)
+    {
+        if (!m_ListenerHash.ContainsKey(callBack))
+        {
+            throw new Exception("RemoveListener Exception: dont find Listener Hash ! eventKey: ->" + eventKey +"<-");
+        }
+
+        InputEventHandle<Event> temp = m_ListenerHash[callBack];
+        m_ListenerHash.Remove(callBack);
+
+        RemoveListener(eventKey, temp);
     }
 
     public override void Dispatch( IInputEventBase inputEvent)
@@ -42,6 +64,10 @@ public class InputDispatcher<Event> : IInputDispatcher where Event : IInputEvent
         {
             m_Listeners[eventKey] -= callBack;
         }
+        //else
+        //{
+        //    Debug.LogError("不存在的UI事件 " + eventKey);
+        //}
     }
 
     InputEventHandle<Event> m_handle;
@@ -60,7 +86,7 @@ public class InputDispatcher<Event> : IInputDispatcher where Event : IInputEvent
         DispatchSingleEvent(inputEvent, OnEventDispatch);
 
         //所有事件派发时都调用
-        AllEventDispatch(typeof(Event).Name, inputEvent);
+        AllEventDispatch(m_eventKey, inputEvent);
     }
 
     void DispatchSingleEvent(Event inputEvent, InputEventHandle<Event> callBack)
@@ -73,7 +99,7 @@ public class InputDispatcher<Event> : IInputDispatcher where Event : IInputEvent
             }
             catch (Exception e)
             {
-                Debug.LogError(e.ToString());
+                Debug.LogError("DispatchSingleEvent Name: " + typeof(Event).ToString() + " key: " + inputEvent.EventKey + " Exception: " + e.ToString());
             }
         }
     }

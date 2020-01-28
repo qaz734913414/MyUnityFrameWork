@@ -36,6 +36,10 @@ public class InterpTypeWrap
 		L.RegVar("OutExpo", get_OutExpo, null);
 		L.RegVar("InOutExpo", get_InOutExpo, null);
 		L.RegVar("OutInExpo", get_OutInExpo, null);
+		L.RegVar("OutBounce", get_OutBounce, null);
+		L.RegVar("InBounce", get_InBounce, null);
+		L.RegVar("InOutBounce", get_InOutBounce, null);
+		L.RegVar("OutInBounce", get_OutInBounce, null);
 		L.RegFunction("IntToEnum", IntToEnum);
 		L.EndEnum();
 	}
@@ -240,6 +244,34 @@ public class InterpTypeWrap
 	static int get_OutInExpo(IntPtr L)
 	{
 		ToLua.Push(L, InterpType.OutInExpo);
+		return 1;
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_OutBounce(IntPtr L)
+	{
+		ToLua.Push(L, InterpType.OutBounce);
+		return 1;
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_InBounce(IntPtr L)
+	{
+		ToLua.Push(L, InterpType.InBounce);
+		return 1;
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_InOutBounce(IntPtr L)
+	{
+		ToLua.Push(L, InterpType.InOutBounce);
+		return 1;
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_OutInBounce(IntPtr L)
+	{
+		ToLua.Push(L, InterpType.OutInBounce);
 		return 1;
 	}
 

@@ -21,12 +21,14 @@ public class ApplicationManagerComponentEditor : Editor
 
         m_statusList = GetStatusList();
         m_currentSelectIndex = GetStatusIndex();
+        //m_app.showLanguageValue = EditorGUILayout.Toggle("Show Language Value", m_app.showLanguageValue);
 
         m_currentSelectIndex = EditorGUILayout.Popup("First Status:", m_currentSelectIndex, m_statusList);
 
         m_app.m_Status = m_statusList[m_currentSelectIndex];
         m_app.m_globalLogic = GetGlobaLogic();
-
+        if (Application.isPlaying)
+            GUILayout.Label("CurrentStatus: " + m_app.currentStatus);
         GUILayout.Space(10);
         if (m_app.m_globalLogic.Count != 0)
         {
@@ -87,7 +89,6 @@ public class ApplicationManagerComponentEditor : Editor
                 return i;
             }
         }
-
         return 0;
     }
 }

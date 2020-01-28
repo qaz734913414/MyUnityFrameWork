@@ -11,7 +11,7 @@ public class FirstStatus : IApplicationStatus
         InputOperationEventProxy.LoadEventCreater<CustomEvent>();
         InputManager.AddListener<CustomEvent>(OnEventCallBack);
 
-        GameObject go =  GameObjectManager.CreatGameObjectByPool("gogo");
+        GameObject go =  GameObjectManager.CreateGameObjectByPool("gogo");
 
         go.transform.position = new Vector3(0,0,300);
 
@@ -24,6 +24,7 @@ public class FirstStatus : IApplicationStatus
 
         AnimSystem.Move(go, null, Vector3.one, callBack: (object[] obj) => { }
             , parameter: new object[] { });
+
     }
 
     //public void CallBackTest(InputNetworkEvent e)

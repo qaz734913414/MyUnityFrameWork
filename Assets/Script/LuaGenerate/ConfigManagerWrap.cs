@@ -9,10 +9,7 @@ public class ConfigManagerWrap
 		L.BeginStaticLibs("ConfigManager");
 		L.RegFunction("GetIsExistConfig", GetIsExistConfig);
 		L.RegFunction("GetData", GetData);
-		L.RegFunction("CleanCatch", CleanCatch);
-		L.RegFunction("SaveData", SaveData);
-		L.RegFunction("GetEditorConfigData", GetEditorConfigData);
-		L.RegFunction("SaveEditorConfigData", SaveEditorConfigData);
+		L.RegFunction("CleanCache", CleanCache);
 		L.RegVar("c_directoryName", get_c_directoryName, null);
 		L.RegVar("c_expandName", get_c_expandName, null);
 		L.EndStaticLibs();
@@ -40,11 +37,27 @@ public class ConfigManagerWrap
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 1);
-			string arg0 = ToLua.CheckString(L, 1);
-			System.Collections.Generic.Dictionary<string,SingleField> o = ConfigManager.GetData(arg0);
-			ToLua.PushObject(L, o);
-			return 1;
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(string)))
+			{
+				string arg0 = ToLua.ToString(L, 1);
+				System.Collections.Generic.Dictionary<string,SingleField> o = ConfigManager.GetData(arg0);
+				ToLua.PushObject(L, o);
+				return 1;
+			}
+			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(string), typeof(string)))
+			{
+				string arg0 = ToLua.ToString(L, 1);
+				string arg1 = ToLua.ToString(L, 2);
+				SingleField o = ConfigManager.GetData(arg0, arg1);
+				ToLua.PushObject(L, o);
+				return 1;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: ConfigManager.GetData");
+			}
 		}
 		catch(Exception e)
 		{
@@ -53,63 +66,12 @@ public class ConfigManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int CleanCatch(IntPtr L)
+	static int CleanCache(IntPtr L)
 	{
 		try
 		{
 			ToLua.CheckArgsCount(L, 0);
-			ConfigManager.CleanCatch();
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int SaveData(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 2);
-			string arg0 = ToLua.CheckString(L, 1);
-			System.Collections.Generic.Dictionary<string,SingleField> arg1 = (System.Collections.Generic.Dictionary<string,SingleField>)ToLua.CheckObject(L, 2, typeof(System.Collections.Generic.Dictionary<string,SingleField>));
-			ConfigManager.SaveData(arg0, arg1);
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetEditorConfigData(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 1);
-			string arg0 = ToLua.CheckString(L, 1);
-			System.Collections.Generic.Dictionary<string,object> o = ConfigManager.GetEditorConfigData(arg0);
-			ToLua.PushObject(L, o);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int SaveEditorConfigData(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 2);
-			string arg0 = ToLua.CheckString(L, 1);
-			System.Collections.Generic.Dictionary<string,object> arg1 = (System.Collections.Generic.Dictionary<string,object>)ToLua.CheckObject(L, 2, typeof(System.Collections.Generic.Dictionary<string,object>));
-			ConfigManager.SaveEditorConfigData(arg0, arg1);
+			ConfigManager.CleanCache();
 			return 0;
 		}
 		catch(Exception e)

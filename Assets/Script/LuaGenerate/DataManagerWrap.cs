@@ -9,10 +9,7 @@ public class DataManagerWrap
 		L.BeginClass(typeof(DataManager), typeof(System.Object));
 		L.RegFunction("GetIsExistData", GetIsExistData);
 		L.RegFunction("GetData", GetData);
-		L.RegFunction("CleanCatch", CleanCatch);
-		L.RegFunction("SaveData", SaveData);
-		L.RegFunction("GetEditorData", GetEditorData);
-		L.RegFunction("SaveEditorData", SaveEditorData);
+		L.RegFunction("CleanCache", CleanCache);
 		L.RegFunction("New", _CreateDataManager);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("c_directoryName", get_c_directoryName, null);
@@ -79,63 +76,12 @@ public class DataManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int CleanCatch(IntPtr L)
+	static int CleanCache(IntPtr L)
 	{
 		try
 		{
 			ToLua.CheckArgsCount(L, 0);
-			DataManager.CleanCatch();
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int SaveData(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 2);
-			string arg0 = ToLua.CheckString(L, 1);
-			DataTable arg1 = (DataTable)ToLua.CheckObject(L, 2, typeof(DataTable));
-			DataManager.SaveData(arg0, arg1);
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetEditorData(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 1);
-			string arg0 = ToLua.CheckString(L, 1);
-			System.Collections.Generic.Dictionary<string,object> o = DataManager.GetEditorData(arg0);
-			ToLua.PushObject(L, o);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int SaveEditorData(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 2);
-			string arg0 = ToLua.CheckString(L, 1);
-			System.Collections.Generic.Dictionary<string,object> arg1 = (System.Collections.Generic.Dictionary<string,object>)ToLua.CheckObject(L, 2, typeof(System.Collections.Generic.Dictionary<string,object>));
-			DataManager.SaveEditorData(arg0, arg1);
+			DataManager.CleanCache();
 			return 0;
 		}
 		catch(Exception e)

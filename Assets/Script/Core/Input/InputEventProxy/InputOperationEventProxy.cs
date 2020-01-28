@@ -5,7 +5,6 @@ using System;
 
 public class InputOperationEventProxy : IInputProxyBase
 {
-
     static List<IInputOperationEventCreater> s_creates = new List<IInputOperationEventCreater>();
 
     public static void Init()
@@ -58,5 +57,13 @@ public class InputOperationEventProxy : IInputProxyBase
         }
     }
 
+    public static void DispatchInputOperationEvent(IInputOperationEventBase inputOperationEventBase,string eventName)
+    {
+        //只有允许输入时才派发事件
+        if (IsActive)
+        {
+            InputManager.Dispatch(eventName, inputOperationEventBase);
+        }
+    }
 
 }

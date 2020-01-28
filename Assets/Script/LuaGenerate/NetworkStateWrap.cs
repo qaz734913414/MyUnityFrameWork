@@ -11,6 +11,7 @@ public class NetworkStateWrap
 		L.RegVar("Connecting", get_Connecting, null);
 		L.RegVar("ConnectBreak", get_ConnectBreak, null);
 		L.RegVar("FaildToConnect", get_FaildToConnect, null);
+		L.RegVar("NetworkError", get_NetworkError, null);
 		L.RegFunction("IntToEnum", IntToEnum);
 		L.EndEnum();
 	}
@@ -40,6 +41,13 @@ public class NetworkStateWrap
 	static int get_FaildToConnect(IntPtr L)
 	{
 		ToLua.Push(L, NetworkState.FaildToConnect);
+		return 1;
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_NetworkError(IntPtr L)
+	{
+		ToLua.Push(L, NetworkState.NetworkError);
 		return 1;
 	}
 

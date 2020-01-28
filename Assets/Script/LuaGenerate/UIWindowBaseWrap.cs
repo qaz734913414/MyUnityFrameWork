@@ -9,19 +9,28 @@ public class UIWindowBaseWrap
 		L.BeginClass(typeof(UIWindowBase), typeof(UIBase));
 		L.RegFunction("OnOpen", OnOpen);
 		L.RegFunction("OnClose", OnClose);
+		L.RegFunction("OnHide", OnHide);
+		L.RegFunction("OnShow", OnShow);
 		L.RegFunction("OnRefresh", OnRefresh);
 		L.RegFunction("EnterAnim", EnterAnim);
 		L.RegFunction("OnCompleteEnterAnim", OnCompleteEnterAnim);
 		L.RegFunction("ExitAnim", ExitAnim);
 		L.RegFunction("OnCompleteExitAnim", OnCompleteExitAnim);
+		L.RegFunction("Show", Show);
+		L.RegFunction("Hide", Hide);
+		L.RegFunction("InitWindow", InitWindow);
+		L.RegFunction("RecursionInitUI", RecursionInitUI);
 		L.RegFunction("Refresh", Refresh);
 		L.RegFunction("AddEventListener", AddEventListener);
 		L.RegFunction("RemoveAllListener", RemoveAllListener);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
+		L.RegVar("cameraKey", get_cameraKey, set_cameraKey);
 		L.RegVar("m_UIType", get_m_UIType, set_m_UIType);
+		L.RegVar("windowStatus", get_windowStatus, set_windowStatus);
 		L.RegVar("m_bgMask", get_m_bgMask, set_m_bgMask);
 		L.RegVar("m_uiRoot", get_m_uiRoot, set_m_uiRoot);
+		L.RegVar("m_PosZ", get_m_PosZ, set_m_PosZ);
 		L.EndClass();
 	}
 
@@ -49,6 +58,38 @@ public class UIWindowBaseWrap
 			ToLua.CheckArgsCount(L, 1);
 			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
 			obj.OnClose();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int OnHide(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
+			obj.OnHide();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int OnShow(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
+			obj.OnShow();
 			return 0;
 		}
 		catch(Exception e)
@@ -194,6 +235,75 @@ public class UIWindowBaseWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int Show(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
+			obj.Show();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int Hide(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
+			obj.Hide();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int InitWindow(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
+			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
+			obj.InitWindow(arg0);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int RecursionInitUI(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 5);
+			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
+			UIBase arg0 = (UIBase)ToLua.CheckUnityObject(L, 2, typeof(UIBase));
+			UIBase arg1 = (UIBase)ToLua.CheckUnityObject(L, 3, typeof(UIBase));
+			int arg2 = (int)LuaDLL.luaL_checknumber(L, 4);
+			System.Collections.Generic.List<UILifeCycleInterface> arg3 = (System.Collections.Generic.List<UILifeCycleInterface>)ToLua.CheckObject(L, 5, typeof(System.Collections.Generic.List<UILifeCycleInterface>));
+			obj.RecursionInitUI(arg0, arg1, arg2, arg3);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int Refresh(IntPtr L)
 	{
 		try
@@ -290,6 +400,25 @@ public class UIWindowBaseWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_cameraKey(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIWindowBase obj = (UIWindowBase)o;
+			string ret = obj.cameraKey;
+			LuaDLL.lua_pushstring(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index cameraKey on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_m_UIType(IntPtr L)
 	{
 		object o = null;
@@ -305,6 +434,25 @@ public class UIWindowBaseWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_UIType on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_windowStatus(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIWindowBase obj = (UIWindowBase)o;
+			UIWindowBase.WindowStatus ret = obj.windowStatus;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index windowStatus on a nil value" : e.Message);
 		}
 	}
 
@@ -347,6 +495,44 @@ public class UIWindowBaseWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_m_PosZ(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIWindowBase obj = (UIWindowBase)o;
+			float ret = obj.m_PosZ;
+			LuaDLL.lua_pushnumber(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_PosZ on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_cameraKey(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIWindowBase obj = (UIWindowBase)o;
+			string arg0 = ToLua.CheckString(L, 2);
+			obj.cameraKey = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index cameraKey on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int set_m_UIType(IntPtr L)
 	{
 		object o = null;
@@ -362,6 +548,25 @@ public class UIWindowBaseWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_UIType on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_windowStatus(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIWindowBase obj = (UIWindowBase)o;
+			UIWindowBase.WindowStatus arg0 = (UIWindowBase.WindowStatus)ToLua.CheckObject(L, 2, typeof(UIWindowBase.WindowStatus));
+			obj.windowStatus = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index windowStatus on a nil value" : e.Message);
 		}
 	}
 
@@ -400,6 +605,25 @@ public class UIWindowBaseWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_uiRoot on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_m_PosZ(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UIWindowBase obj = (UIWindowBase)o;
+			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
+			obj.m_PosZ = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_PosZ on a nil value" : e.Message);
 		}
 	}
 }

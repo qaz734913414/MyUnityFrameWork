@@ -2,127 +2,179 @@
 using System.Collections;
 using System.Text;
 using System;
+using Object = UnityEngine.Object;
 /*
  * gameLoadType 为 Resource 时 ，所有资源从Resource读取
  * gameLoadType 不为 Resource时，资源读取方式从配置中读取
  * */
 public static class ResourceManager 
 {
+    private static AssetsLoadType loadType = AssetsLoadType.Resources;
+    public static AssetsLoadType LoadType
+    {
+        get
+        {
+            return loadType;
+        }
+
+        //set
+        //{
+        //    ReleaseAll();
+
+        //    loadType = value;
+        //    isInit = false;
+        //    Initialize();
+        //}
+    }
+    public static bool UseCache
+    {
+        get;private set;
+    }
+    private static AssetsLoadController loadAssetsController;
+
+    //    private static bool isInit = false;
+#if UNITY_EDITOR
+        //UnityEditor模式下编译完成后自动初始化
+    [UnityEditor.InitializeOnLoadMethod]
+#endif
+    private static void Initialize()
+    {
+        Initialize(AssetsLoadType.Resources, false);
+    }
     /// <summary>
-    /// 游戏内资源读取类型
+    /// 初始化
     /// </summary>
-    public static ResLoadType m_gameLoadType = ResLoadType.Resource; //默认从resourcePath中读取
-
-    public static ResLoadType GetLoadType(ResLoadType loadType)
+    /// <param name="loadType"></param>
+    /// <param name="useCache"></param>
+    public static void Initialize(AssetsLoadType loadType,bool useCache)
     {
-        //如果设置从Resource中加载则忽略打包设置
-        if (m_gameLoadType == ResLoadType.Resource)
+        //if (isInit)
+        //    return;
+       
+        if(loadType== AssetsLoadType.AssetBundle)
         {
-            return ResLoadType.Resource;
+            useCache = true;
         }
-
-        return loadType;
+        if (!Application.isPlaying)
+        {
+            useCache = false;
+        }
+        UseCache = useCache;
+        ResourceManager.loadType = loadType;
+        ReleaseAll();
+        loadAssetsController = new AssetsLoadController(loadType,useCache);
+        Debug.Log("ResourceManager初始化 AssetsLoadType:" + loadType + " useCache:" + useCache);
     }
 
-    //读取一个文本
-    public static string ReadTextFile(string textName)
+    public static AssetsLoadController GetLoadAssetsController()
     {
-        TextAsset text = (TextAsset)Load(textName);
-
-        if (text == null)
-        {
-            throw new Exception("ReadTextFile not find " + textName);
-        }
-        else
-        {
-            return text.text;
-        }
+        return loadAssetsController;
     }
 
-    //保存一个文本
-    public static void WriteTextFile(string path,string content ,ResLoadType type)
+    /// <summary>
+    /// 同步加载一个资源
+    /// </summary>
+    /// <param name="name"></param>
+    public static Object Load(string name)
     {
-        #if UNITY_EDITOR
-            ResourceIOTool.WriteStringByFile(PathTool.GetAbsolutePath(type, path), content);
-        #else
-            
-        #endif
+        string path = ResourcesConfigManager.GetLoadPath(loadType, name);
+        AssetsData assets = loadAssetsController.LoadAssets(path);
+        if (assets != null)
+        {
+            return assets.Assets[0];
+        }
+        return null;
     }
 
-    public static object Load(string name)
+    public static void LoadAsync(string name, CallBack<Object> callBack)
     {
-        ResourcesConfig packData  = ResourcesConfigManager.GetBundleConfig(name);
-
-        if(packData == null)
-        {
-            throw new Exception("Load Exception not find " + name);
-        }
-
-        if (m_gameLoadType == ResLoadType.Resource)
-        {
-            return Resources.Load(packData.path);
-        }
-        else
-        {
-            return AssetsBundleManager.Load(name);
-        }
+        string path = ResourcesConfigManager.GetLoadPath(loadType, name);
+        loadAssetsController.LoadAsync(path, null, callBack);
     }
-
-    public static T Load<T>(string name) where T: UnityEngine.Object
+    public static void LoadAsync(string name, Type resType, CallBack<Object> callBack)
     {
-        ResourcesConfig packData = ResourcesConfigManager.GetBundleConfig(name);
-
-        if (packData == null)
-        {
-            throw new Exception("Load Exception not find " + name);
-        }
-
-        if (m_gameLoadType == ResLoadType.Resource)
-        {
-            return Resources.Load<T>(packData.path);
-        }
-        else
-        {
-            return AssetsBundleManager.Load<T>(name);
-        }
+        string path = ResourcesConfigManager.GetLoadPath(loadType, name);
+        loadAssetsController.LoadAsync(path, resType, callBack);
     }
-
-    public static void LoadAsync(string name,LoadCallBack callBack)
+    public static T Load<T>(string name) where T : Object
     {
-        ResourcesConfig packData  = ResourcesConfigManager.GetBundleConfig(name);
+        T res =null;
+        string path = ResourcesConfigManager.GetLoadPath(loadType, name);
+        //Debug.Log("ResourcesConfigManager.GetLoadPath :"+ path);
+        AssetsData assets = loadAssetsController.LoadAssets<T>(path);
+        if (assets != null)
+        {
+            res = assets.GetAssets<T>();
 
-        if (packData == null)
-        {
-            return ;
         }
-
-        if (m_gameLoadType == ResLoadType.Resource)
+       if(res ==null)
         {
-            ResourceIOTool.ResourceLoadAsync(packData.path, callBack);
+            Debug.LogError("Error=> Load Name :" + name + "  Type:" + typeof(T).FullName + "\n" + " Load Object:" + res );
         }
-        else
-        {
-            AssetsBundleManager.LoadAsync(name,callBack);
-        }
+        return res;
     }
-
-    //public static T GetResource<T>(string path)
+    //public static T EditorLoad<T>(string name) where T : Object
     //{
-    //    T resouce = new T();
-
-    //    return resouce;
+    //    T res = null;
+    //    string path = ResourcesConfigManager.GetLoadPath( AssetsLoadType.Resources, name);
+    //    res = Resources.Load<T>(path);
+    //    return res;
     //}
+    public static string LoadText(string name)
+    {
+        TextAsset tex = Load<TextAsset>(name);
+        if (tex == null)
+            return null;
+        return tex.text;
+    }
+
+    public static void DestoryAssetsCounter(Object unityObject, int times = 1)
+    {
+        DestoryAssetsCounter(unityObject.name, times);
+    }
+
+    public static void DestoryAssetsCounter(string name, int times = 1)
+    {
+        if (!ResourcesConfigManager.GetIsExitRes(name))
+            return;
+        string path = ResourcesConfigManager.GetLoadPath(loadType, name);
+        if (times <= 0)
+            times = 1;
+        for (int i = 0; i < times; i++)
+        {
+            loadAssetsController.DestoryAssetsCounter(path);
+        }
+    }
+
+    /// <summary>
+    /// 卸载所有资源
+    /// </summary>
+    /// <param name="isForceAB">是否强制卸载bundle（true:bundle包和资源一起卸载；false：只卸载bundle包）</param>
+    public static void ReleaseAll(bool isForceAB=true)
+    {
+        if (loadAssetsController != null)
+            loadAssetsController.ReleaseAll(isForceAB);
+        //ResourcesConfigManager.ClearConfig();
+    }
+
+    public static void Release(string name)
+    {
+        string path = ResourcesConfigManager.GetLoadPath(loadType, name);
+        loadAssetsController.Release(path);
+    }
+
+    public static void ReleaseByPath(string path)
+    {
+        loadAssetsController.Release(path);
+    }
+
+    public static bool GetResourceIsExist(string name)
+    {
+        return ResourcesConfigManager.GetIsExitRes(name);
+    }
 }
 
-public enum ResLoadType
-{
-    Resource,
-    Streaming,
-    Persistent,
-    Catch,
 
-    HotUpdate
-}
 
 
 

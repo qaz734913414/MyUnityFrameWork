@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using FrameWork.SDKManager;
 
 public class ApplicationManager : MonoBehaviour 
 {
@@ -9,76 +10,145 @@ public class ApplicationManager : MonoBehaviour
 
     public static ApplicationManager Instance
     {
-        get { return ApplicationManager.instance; }
+        get {
+            if (instance == null)
+            {
+              instance =  FindObjectOfType<ApplicationManager>();
+
+            }
+            return ApplicationManager.instance; }
         set { ApplicationManager.instance = value; }
     }
 
     public AppMode m_AppMode = AppMode.Developing;
 
+    public bool m_useAssetsBundle = false;
+
+
+
     public static AppMode AppMode
     {
-        get { return instance.m_AppMode; }
-        //set { m_AppMode = value; }
+        get
+        {
+#if APPMODE_DEV
+            return AppMode.Developing;
+#elif APPMODE_QA
+            return AppMode.QA;
+#elif APPMODE_REL
+            return AppMode.Release;
+#else
+            return instance.m_AppMode;
+#endif
+        } 
+    }
+
+    public bool UseAssetsBundle
+    {
+        get
+        {
+#if USE_BUNDLE
+            return true;
+#else
+            return m_useAssetsBundle;
+#endif
+        }
+    }
+
+    public static string Version
+    {
+        get
+        {
+            return Application.version + "." + HotUpdateManager.GetHotUpdateVersion();
+        }
     }
 
 
+    [Tooltip("是否记录输入到本地")]
+    public bool m_recordInput = true;
+
     //快速启动
     public bool m_quickLunch = true;
-
-    //启用Lua
-    public bool m_useLua = false;
 
     [HideInInspector]
     public string m_Status = "";
 
     [HideInInspector]
     public List<string> m_globalLogic;
+    [HideInInspector]
+    public string currentStatus;
 
+    /// <summary>
+    /// 语言
+    /// </summary>
+    public SystemLanguage langguage = SystemLanguage.ChineseSimplified;
+    /// <summary>
+    /// 显示括号标识多语言转换的字段
+    /// </summary>
+    public bool showLanguageValue = false;
     public void Awake()
     {
         instance = this;
         AppLaunch();
     }
-
+    [Tooltip("加载资源时是否使用缓存，Bundle加载不起作用(都为使用)")]
+    public bool useCacheWhenLoadResource = true;
     /// <summary>
     /// 程序启动
     /// </summary>
     public void AppLaunch()
     {
         DontDestroyOnLoad(gameObject);
-        SetResourceLoadType();               //设置资源加载类型
-        ResourcesConfigManager.Initialize(); //资源路径管理器启动
+        Application.runInBackground = true;
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
+        SetResourceLoadType(useCacheWhenLoadResource);               //设置资源加载类型
+
+        AudioPlayManager.Init();
         MemoryManager.Init();                //内存管理初始化
-
+        Timer.Init();                        //计时器启动
         InputManager.Init();                 //输入管理器启动
-        UIManager.Init();                    //UIManager启动
 
-        if (m_useLua)
-        {
-            LuaManager.Init();
-        }
+#if !UNITY_WEBGL
+        UIManager.Init();                    //UIManager启动
+#else
+        UIManager.InitAsync();               //异步加载UIManager
+#endif
 
         ApplicationStatusManager.Init();     //游戏流程状态机初始化
         GlobalLogicManager.Init();           //初始化全局逻辑
 
-        if (m_AppMode != AppMode.Release)
+        SDKManager.Init();                   //初始化SDKManger
+
+        if (AppMode != AppMode.Release)
         {
             GUIConsole.Init(); //运行时Console
 
             DevelopReplayManager.OnLunchCallBack += () =>
             {
+#if USE_LUA
+                LuaManager.Init();
+#endif
                 InitGlobalLogic();                                //全局逻辑
                 ApplicationStatusManager.EnterTestModel(m_Status);//可以从此处进入测试流程
             };
 
-            DevelopReplayManager.Init(m_quickLunch);   //开发者复盘管理器                              
+            DevelopReplayManager.Init(m_quickLunch);   //开发者复盘管理器
+
+            LanguageManager.Init();
+            LanguageManager.SetLanguage(langguage);
         }
         else
         {
             Log.Init(false); //关闭 Debug
 
+#if USE_LUA
+            LuaManager.Init();
+#endif
             InitGlobalLogic();                             //全局逻辑
             ApplicationStatusManager.EnterStatus(m_Status);//游戏流程状态机，开始第一个状态
+
+            LanguageManager.Init();
+           
         }
     }
 
@@ -88,7 +158,10 @@ public class ApplicationManager : MonoBehaviour
     public static ApplicationBoolCallback s_OnApplicationPause = null;
     public static ApplicationBoolCallback s_OnApplicationFocus = null;
     public static ApplicationVoidCallback s_OnApplicationUpdate = null;
+    public static ApplicationVoidCallback s_OnApplicationFixedUpdate = null;
     public static ApplicationVoidCallback s_OnApplicationOnGUI = null;
+    public static ApplicationVoidCallback s_OnApplicationOnDrawGizmos = null;
+    public static ApplicationVoidCallback s_OnApplicationLateUpdate = null;
 
     void OnApplicationQuit()
     {
@@ -105,11 +178,11 @@ public class ApplicationManager : MonoBehaviour
         }
     }
 
-    /*
-     * 强制暂停时，先 OnApplicationPause，后 OnApplicationFocus
-     * 重新“启动”游戏时，先OnApplicationFocus，后 OnApplicationPause
-     */
-    void OnApplicationPause(bool pauseStatus)
+/*
+ * 强制暂停时，先 OnApplicationPause，后 OnApplicationFocus
+ * 重新“启动”游戏时，先OnApplicationFocus，后 OnApplicationPause
+ */
+void OnApplicationPause(bool pauseStatus)
     {
         if (s_OnApplicationPause != null)
         {
@@ -145,10 +218,30 @@ public class ApplicationManager : MonoBehaviour
             s_OnApplicationUpdate();
     }
 
+    private void LateUpdate()
+    {
+        if(s_OnApplicationLateUpdate != null)
+        {
+            s_OnApplicationLateUpdate();
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (s_OnApplicationFixedUpdate != null)
+            s_OnApplicationFixedUpdate();
+    }
+
     void OnGUI()
     {
         if (s_OnApplicationOnGUI != null)
             s_OnApplicationOnGUI();
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (s_OnApplicationOnDrawGizmos != null)
+            s_OnApplicationOnDrawGizmos();
     }
 
     #endregion
@@ -157,15 +250,16 @@ public class ApplicationManager : MonoBehaviour
     /// <summary>
     /// 设置资源加载方式
     /// </summary>
-    void SetResourceLoadType()
+    void SetResourceLoadType(bool useCache)
     {
-        if (m_AppMode == AppMode.Developing)
+        if (UseAssetsBundle)
         {
-            ResourceManager.m_gameLoadType = ResLoadType.Resource;
+
+            ResourceManager.Initialize ( AssetsLoadType.AssetBundle,useCache);
         }
         else
         {
-            ResourceManager.m_gameLoadType = ResLoadType.HotUpdate;
+            ResourceManager.Initialize(AssetsLoadType.Resources, useCache);
         }
     }
 
@@ -179,7 +273,7 @@ public class ApplicationManager : MonoBehaviour
             GlobalLogicManager.InitLogic(m_globalLogic[i]);
         }
     }
-    #endregion
+#endregion
 }
 
 public enum AppMode

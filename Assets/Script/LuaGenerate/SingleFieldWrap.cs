@@ -40,30 +40,37 @@ public class SingleFieldWrap
 				ToLua.PushObject(L, obj);
 				return 1;
 			}
-			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Vector2)))
+			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Color)))
 			{
-				UnityEngine.Vector2 arg0 = ToLua.ToVector2(L, 1);
+				UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.CheckObject(L, 1, typeof(UnityEngine.Color));
 				SingleField obj = new SingleField(arg0);
 				ToLua.PushObject(L, obj);
 				return 1;
 			}
 			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Vector3)))
 			{
-				UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 1);
+				UnityEngine.Vector3 arg0 = (UnityEngine.Vector3)ToLua.CheckObject(L, 1, typeof(UnityEngine.Vector3));
 				SingleField obj = new SingleField(arg0);
 				ToLua.PushObject(L, obj);
 				return 1;
 			}
-			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Color)))
+			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(System.Enum)))
 			{
-				UnityEngine.Color arg0 = ToLua.ToColor(L, 1);
+				System.Enum arg0 = (System.Enum)ToLua.CheckObject(L, 1, typeof(System.Enum));
 				SingleField obj = new SingleField(arg0);
 				ToLua.PushObject(L, obj);
 				return 1;
 			}
-			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(bool)))
+			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(System.Collections.Generic.List<string>)))
 			{
-				bool arg0 = LuaDLL.luaL_checkboolean(L, 1);
+				System.Collections.Generic.List<string> arg0 = (System.Collections.Generic.List<string>)ToLua.CheckObject(L, 1, typeof(System.Collections.Generic.List<string>));
+				SingleField obj = new SingleField(arg0);
+				ToLua.PushObject(L, obj);
+				return 1;
+			}
+			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Vector2)))
+			{
+				UnityEngine.Vector2 arg0 = (UnityEngine.Vector2)ToLua.CheckObject(L, 1, typeof(UnityEngine.Vector2));
 				SingleField obj = new SingleField(arg0);
 				ToLua.PushObject(L, obj);
 				return 1;
@@ -78,6 +85,13 @@ public class SingleFieldWrap
 			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(float)))
 			{
 				float arg0 = (float)LuaDLL.luaL_checknumber(L, 1);
+				SingleField obj = new SingleField(arg0);
+				ToLua.PushObject(L, obj);
+				return 1;
+			}
+			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(bool)))
+			{
+				bool arg0 = LuaDLL.luaL_checkboolean(L, 1);
 				SingleField obj = new SingleField(arg0);
 				ToLua.PushObject(L, obj);
 				return 1;

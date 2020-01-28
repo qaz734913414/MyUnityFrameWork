@@ -5,8 +5,9 @@ using UnityEngine;
 //该类自动生成请勿修改，以避免不必要的损失
 public class itemGenerate : DataGenerateBase 
 {
-	public Color m_asdasd; //颜色
-	public Vector2 m_tt; //枚举测试
+	public string m_key;
+	public string m_ItemName;
+	public int m_Cost;
 
 	public override void LoadData(string key) 
 	{
@@ -19,7 +20,8 @@ public class itemGenerate : DataGenerateBase
 
 		SingleData data = table[key];
 
-		m_asdasd = data.GetColor("asdasd");
-		m_tt = data.GetVector2("tt");
+		m_key = key;
+		m_ItemName = data.GetString("ItemName");
+		m_Cost = data.GetInt("Cost");
 	}
 }

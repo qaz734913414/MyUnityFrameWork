@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public abstract class IInputProxyBase
 {
@@ -17,71 +18,56 @@ public abstract class IInputProxyBase
 
     #region 事件池
 
-    static Dictionary<string, EventPool> m_eventPool = new Dictionary<string, EventPool>();
+    //public static T GetEvent<T>() where T : IInputEventBase, new()
+    //{
+    //    return InputOperationEventProxy.GetEvent<T>();
+    //}
 
-    public static T GetEvent<T>() where T : IInputEventBase, new()
+    public static T GetEvent<T>(string eventKey) where T : IInputEventBase, new()
     {
-        string cmdKey = typeof(T).Name;
+        T tmp = HeapObjectPool<T>.GetObject();
+        tmp.EventKey = eventKey;
 
-        if (!m_eventPool.ContainsKey(cmdKey))
-        {
-            EventPool pool = new EventPool();
-            pool.Init<T>(3);
-
-            m_eventPool.Add(cmdKey, pool);
-        }
-
-
-        return (T)m_eventPool[cmdKey].GetEvent();
-    }
-
-    class EventPool
-    {
-        IInputEventBase[] m_pool;
-        int m_poolIndex = 0;
-
-        public void Init<T>(int size) where T : IInputEventBase, new()
-        {
-            m_pool = new T[size];
-            for (int i = 0; i < size; i++)
-            {
-                m_pool[i] = new T();
-            }
-        }
-
-        public IInputEventBase GetEvent()
-        {
-            IInputEventBase cmd = m_pool[m_poolIndex];
-            cmd.Reset();
-
-            m_poolIndex++;
-
-            if (m_poolIndex >= m_pool.Length)
-            {
-                m_poolIndex = 0;
-            }
-
-            return cmd;
-        }
+        return tmp;
     }
 
     #endregion
 }
 
-public class InputEventRegisterInfo<T> where T: IInputEventBase
+public class InputEventRegisterInfo : IHeapObjectInterface
 {
     public string eventKey;
+    public void OnInit(){}
+    public void OnPop(){}
+    public void OnPush(){}
+    public virtual void AddListener() { }
+    public virtual void RemoveListener() { }
+}
+
+public class InputEventRegisterInfo<T> : InputEventRegisterInfo where T : IInputEventBase
+{
     public InputEventHandle<T> callBack;
 
-    public void AddListener()
+    public InputEventRegisterInfo()
+    {
+    }
+
+    /// <summary>
+    /// 添加监听和派发
+    /// </summary>
+    /// <param name="isRegister">这个eventKey是否已经注册过了，如果是则不在派发对象上重复派发</param>
+    public override void AddListener()
     {
         InputManager.AddListener<T>(eventKey, callBack);
     }
 
-    public virtual void RemoveListener()
+    /// <summary>
+    /// 移除监听和派发
+    /// </summary>
+    /// <param name="isRegister">这是不是这个eventKey最后一个监听事件，如果是则移除派发</param>
+    public override void RemoveListener()
     {
         InputManager.RemoveListener<T>(eventKey, callBack);
+        HeapObjectPool<InputEventRegisterInfo<T>>.PutObject(this);
     }
-
-    
 }

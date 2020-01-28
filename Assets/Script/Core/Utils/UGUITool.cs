@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-/// <summary>
-/// 存点儿 用户登陆数据 游戏设置 相关的数据（可读写）
-/// </summary>
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -11,7 +9,7 @@ public class UGUITool
     static PointerEventData eventDatas = new PointerEventData(EventSystem.current);
     static List<RaycastResult> hit = new List<RaycastResult>();
 
-    static public bool isHitUI()
+    static public bool IsHitUI()
     {
         eventDatas.position = Input.mousePosition;
         eventDatas.pressPosition = Input.mousePosition;
@@ -25,9 +23,53 @@ public class UGUITool
         return false;
     }
     
-    static public void set_icon(Image img,string name)
+    static public void SetImageSprite(Image img,string name,bool is_nativesize = false)
     {
-        img.overrideSprite = ResourceManager.Load<Sprite>(name);
-        img.SetNativeSize();
+        if(name == null)
+        {
+            Debug.LogError("set_icon Image name 不能为 null !" );
+            return;
+        }
+
+        if (img == null)
+        {
+            Debug.LogError("set_icon Image 不能为 null !");
+            return;
+        }
+        try
+        {
+            Sprite sp = ResourceManager.Load<Sprite>(name);
+            img.overrideSprite = sp;
+            img.sprite = img.overrideSprite;
+
+            if (is_nativesize)
+                img.SetNativeSize();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("SetImageSprite 加载失败，查看资源是否存在，图片格式是否正确:" + name+"\n"+e);
+        }
     }
+
+    static public void SetSpriteRender(GameObject go, string name)
+    {
+        SpriteRenderer sprite = go.GetComponent<SpriteRenderer>();
+        sprite.sprite = LoadSprite(name);
+    }
+
+    public static Sprite LoadSprite(string resName)
+    {
+        try
+        {
+            Texture2D texture = ResourceManager.Load<Texture2D>(resName);
+
+            return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("加载图片失败：" + resName+"\n"+e);
+            return null;
+        }
+    }
+   
 }
